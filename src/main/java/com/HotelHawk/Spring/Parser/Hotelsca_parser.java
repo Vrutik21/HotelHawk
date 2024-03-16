@@ -1,21 +1,21 @@
 package com.HotelHawk.Spring.Parser;
 
+import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Hotelsca_parser {
     public static ArrayList<String> links= new ArrayList<String>();
+    public static HashMap<String,ArrayList<String>> hotels=new HashMap<String,ArrayList<String>>();
     public static void extract_links() throws IOException, InterruptedException {
-        File file=new File("hotelsca_links.txt");
+        File file=new File("hotelsca_links");
         BufferedReader br=new BufferedReader(new FileReader(file));
         String st;
         while((st=br.readLine())!=null){
@@ -65,7 +65,15 @@ public class Hotelsca_parser {
 
             }
         }
+        convert_json();
 
+    }
+    public static void convert_json() throws FileNotFoundException {
+        JSONObject json=new JSONObject(hotels);
+        String json_string= json.toString();
+        PrintWriter pw= new PrintWriter("booking_json");
+        pw.println(json_string);
+        pw.close();
     }
     public static void main(String[] args){
 

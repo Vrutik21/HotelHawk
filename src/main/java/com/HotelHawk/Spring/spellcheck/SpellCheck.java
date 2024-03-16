@@ -17,7 +17,7 @@ public class SpellCheck {
         cities.add("CALGARY");
         cities.add("VANCOUVER");
         cities.add("MONTREAL");
-        return edit_distance("voncver".toUpperCase());
+        return edit_distance(cityname.toUpperCase());
     }
     static int min(int x, int y, int z)
     {

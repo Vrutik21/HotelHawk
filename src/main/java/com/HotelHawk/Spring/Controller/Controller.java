@@ -15,5 +15,6 @@ public class Controller {
         CrawlerController c=new CrawlerController();
         c.booking_crawl(cityname);
         c.hotel_crawl(cityname);
+
     }
 }

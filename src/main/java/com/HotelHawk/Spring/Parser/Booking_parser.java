@@ -1,5 +1,7 @@
 package com.HotelHawk.Spring.Parser;
 
+import netscape.javascript.JSObject;
+import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,6 +15,7 @@ import java.util.HashMap;
 public class Booking_parser {
     public static String checkin_out="&checkin=2024-03-21&checkout=2024-03-22&dest_id=-574890&dest_type=city";
     public static ArrayList<String> links= new ArrayList<String>();
+    public static HashMap<String,ArrayList<String>> hotels=new HashMap<String,ArrayList<String>>();
     public static void extract_links() throws IOException {
         File file=new File("booking_links");
         BufferedReader br=new BufferedReader(new FileReader(file));
@@ -23,7 +26,7 @@ public class Booking_parser {
         extract_hotels(links, checkin_out);
     }
     public static void extract_hotels(ArrayList<String> links, String checkin_out) throws IOException {
-        HashMap<String,ArrayList<String>> hotels=new HashMap<String,ArrayList<String>>();
+
         for(String link:links){
             ArrayList<String> temp_data=new ArrayList<String>();
             int ind=link.lastIndexOf("city");
@@ -86,7 +89,16 @@ public class Booking_parser {
                     hotels.put(temp_data.get(0),temp_data);
                 }
         }
+        convert_json();
 
+    }
+
+    public static void convert_json() throws FileNotFoundException {
+        JSONObject json=new JSONObject(hotels);
+        String json_string= json.toString();
+        PrintWriter pw= new PrintWriter("booking_json");
+        pw.println(json_string);
+        pw.close();
     }
 
     public static void main(String[] args) throws IOException {
