@@ -7,8 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
-@RestController
+@org.springframework.stereotype.Controller
 public class Controller {
+    @RequestMapping("/")
+    public String homepage(){
+        return "index";
+    }
     @RequestMapping("/search/{cityname}")
     public void crawl_all(@PathVariable String cityname) throws IOException, InterruptedException {
         //getting city name from HTTP Request

@@ -26,6 +26,7 @@ public class Hotelsca_parser {
     }
     public static void hotels_parse() throws IOException, InterruptedException {
         WebDriver driver =new FirefoxDriver();
+        ArrayList<String> temp_data=new ArrayList<>();
         for(String link:links){
             if(link!=null){
                 driver.get(link);
@@ -36,18 +37,22 @@ public class Hotelsca_parser {
 //                driver.wait(10000);
                 //getting name of hotel
                 WebElement name=driver.findElement(By.tagName("h1"));
+                temp_data.add(name.getText());
                 //getting photos
                 List<WebElement> photos=  driver.findElements(By.cssSelector(".uitk-image-placeholder.uitk-image-placeholder-image"));
                 System.out.println(name.getText());
+                String im="";
                 for(WebElement w:photos){
                     List<WebElement> phots=w.findElements(By.tagName("img"));
                     for(WebElement p:phots){
-                        System.out.println(p.getAttribute("src"));
+                        im+=(p.getAttribute("src"))+" ";
                     }
                 }
+                temp_data.add(im);
                 //getting reviews
                 WebElement rev=driver.findElement(By.xpath("//meta[@itemprop='ratingValue']"));
                 System.out.println(rev.getAttribute("content"));
+                temp_data.add(rev.getAttribute("content"));
 
                 //getting hotel location
                 WebElement loc=driver.findElement(By.xpath("//meta[@itemprop='streetAddress']"));
@@ -65,6 +70,7 @@ public class Hotelsca_parser {
 
             }
         }
+        hotels.put(temp_data.get(0), temp_data);
         convert_json();
 
     }
