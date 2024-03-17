@@ -7,9 +7,10 @@ import java.util.HashMap;
 public class SearchFreq {
     public static HashMap<String,Integer> map=new HashMap<String, Integer>();
     public static void get_old_data(){
-        for(String)
+
     }
     public static void update(){
+
 
     }
     public static void save() throws FileNotFoundException {

@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class SearchFrequencyController {
-    @RequestMapping("/find/{cityname}")
-    public void search(@PathVariable String cityname){
-        //SearchFreq.
-    }
+//    @RequestMapping("/find/{cityname}")
+//    public void search(@PathVariable String cityname){
+//        //SearchFreq.
+//    }
 }

@@ -19,13 +19,13 @@ public class Controller {
         c.booking_crawl(cityname);
         c.hotel_crawl(cityname);
         ///updating search frequency data
-        SearchFrequencyController sc=new SearchFrequencyController();
+        //SearchFrequencyController sc=new SearchFrequencyController();
     }
     @RequestMapping("/find/{cityname}")
     public void find_city(@PathVariable String cityname){
         WordCompletionCrawler wc= new WordCompletionCrawler();
         wc.word_completion(cityname);
         ///getting search freq data
-        SearchFrequencyController sc=new SearchFrequencyController();
+        //SearchFrequencyController sc=new SearchFrequencyController();
     }
 }

@@ -1,4 +1,4 @@
-package crawlers;
+package com.HotelHawk.Spring.Crawler;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -15,7 +15,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 
 
-public class MakeMyTrip {
+public class MakeMyTrip_crawler {
 	 public HashMap<String, ArrayList<String>> data = new HashMap<>();
 
 	    public static Hashtable<String,Hashtable> extractCities(String url, String[] cities) {
