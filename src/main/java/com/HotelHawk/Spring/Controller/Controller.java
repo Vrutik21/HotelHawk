@@ -1,13 +1,12 @@
 package com.HotelHawk.Spring.Controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
 @org.springframework.stereotype.Controller
+
 public class Controller {
     @RequestMapping("/")
     public String homepage(){
@@ -19,6 +18,14 @@ public class Controller {
         CrawlerController c=new CrawlerController();
         c.booking_crawl(cityname);
         c.hotel_crawl(cityname);
-
+        ///updating search frequency data
+        SearchFrequencyController sc=new SearchFrequencyController();
+    }
+    @RequestMapping("/find/{cityname}")
+    public void find_city(@PathVariable String cityname){
+        WordCompletionCrawler wc= new WordCompletionCrawler();
+        wc.word_completion(cityname);
+        ///getting search freq data
+        SearchFrequencyController sc=new SearchFrequencyController();
     }
 }

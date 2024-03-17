@@ -43,12 +43,12 @@ public class Booking_parser {
                     //getting prices
                     Elements e = d.getElementsByTag("tr");
                     String temp_price = "";
-                    int min=0;
+                    int min=1000000;
                     if (e.hasAttr("data-hotel-rounded-price")) {
                         //Elements ef=e.getElementsByAttribute("data-hotel-rounded-price");
                         for (Element l : e) {
                             String pri = l.attr("data-hotel-rounded-price");
-                            if (pri!="" && Integer.parseInt(pri)>min){
+                            if (pri!="" && Integer.parseInt(pri)<min){
                                 min=Integer.parseInt(pri);
                             }
                         }

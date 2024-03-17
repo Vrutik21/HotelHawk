@@ -88,6 +88,12 @@ public class WordCompletion {
         suggestHelper(lastNode, list, curr);
         return list;
     }
+    public static List<String> initialize(String city){
+        List<String> words = List.of("VANCOUVER", "TORONTO", "CALGARY");
+        WordCompletion trie = new WordCompletion(words);
+        return trie.suggest("v".toUpperCase());
+
+    }
     public static void main(String[] args) {
         List<String> words = List.of("VANCOUVER", "TORONTO", "CALGARY");
         WordCompletion trie = new WordCompletion(words);

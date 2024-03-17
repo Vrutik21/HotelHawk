@@ -5,8 +5,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.*;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +25,6 @@ public class Hotelsca_parser {
             links.add(st);
         }
         hotels_parse();
-
     }
     public static void hotels_parse() throws IOException, InterruptedException {
         WebDriver driver =new FirefoxDriver();
@@ -30,9 +32,9 @@ public class Hotelsca_parser {
         for(String link:links){
             if(link!=null){
                 driver.get(link);
-//                By locator= By.cssSelector(".uitk-text.uitk-type-300.uitk-text-default-theme.is-visually-hidden");
-//                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-//                wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+                By locator= By.cssSelector(".uitk-text.uitk-type-300.uitk-text-default-theme.is-visually-hidden");
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                wait.until(ExpectedConditions.presenceOfElementLocated(locator));
 //                driver.manage().window().maximize();
 //                driver.wait(10000);
                 //getting name of hotel
@@ -42,10 +44,16 @@ public class Hotelsca_parser {
                 List<WebElement> photos=  driver.findElements(By.cssSelector(".uitk-image-placeholder.uitk-image-placeholder-image"));
                 System.out.println(name.getText());
                 String im="";
+                int count=0;
                 for(WebElement w:photos){
                     List<WebElement> phots=w.findElements(By.tagName("img"));
                     for(WebElement p:phots){
-                        im+=(p.getAttribute("src"))+" ";
+                        if (count<6){
+                            im+=(p.getAttribute("src"))+" ";
+                        }
+                        else{
+                            break;
+                        }
                     }
                 }
                 temp_data.add(im);
@@ -67,7 +75,28 @@ public class Hotelsca_parser {
                     }
                 }
                 ///getting room type and their prices
+                ////getting room type
+//                List<WebElement> room = driver.findElements(By.cssSelector(".uitk-spacing.uitk-spacing-padding-small-blockend-half"));
+//
+//                for(WebElement w:room){
+//                    String t=w.findElement(By.tagName("h3")).getText();
+//                    if (t!=null){
+//                        System.out.println(t);
+//                    }
+//                }
 
+                //getting room prices, getting min price right now
+                int min=100000;
+                List<WebElement> pric=driver.findElements(By.cssSelector(".uitk-text.uitk-type-300.uitk-text-default-theme.is-visually-hidden"));
+                for(WebElement w:pric){
+                    if (w.getText()!=""){
+                        String t=w.getText();
+                        String t_f=t.substring(t.lastIndexOf('$')+1);
+                        if(min>Integer.parseInt(t_f)){
+                            min=Integer.parseInt(t_f);
+                        }
+                    }
+                }
             }
         }
         hotels.put(temp_data.get(0), temp_data);
@@ -77,7 +106,7 @@ public class Hotelsca_parser {
     public static void convert_json() throws FileNotFoundException {
         JSONObject json=new JSONObject(hotels);
         String json_string= json.toString();
-        PrintWriter pw= new PrintWriter("booking_json");
+        PrintWriter pw= new PrintWriter("hotelsca_json");
         pw.println(json_string);
         pw.close();
     }
