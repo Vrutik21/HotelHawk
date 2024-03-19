@@ -13,7 +13,7 @@ import org.openqa.selenium.WebDriver;
 
 
 
-public class MakeMyTrip_Parser {
+public class MakeMyTrip_parser {
      
 	public static Hashtable<String,String[]> Make_My_Trip_Parser(Document document,String city) throws FileNotFoundException
 	{
