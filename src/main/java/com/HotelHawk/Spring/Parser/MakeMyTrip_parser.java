@@ -55,12 +55,7 @@ public class MakeMyTrip_parser {
           }	
       
       //saving the images of the hotels
-   
-
       String str4 = l.getElementsByAttributeValue("alt","hotelImg").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_1").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_2").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_3").attr("src");
-// 
-
-      	//System.out.println(str4);
       String str5 =  l.getElementsByAttributeValue("itemprop","ratingValue").text();
       
       
