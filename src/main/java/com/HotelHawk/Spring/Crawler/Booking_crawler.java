@@ -28,7 +28,7 @@ public class Booking_crawler {
                 if (!check.contains(str.substring(0,100))){
                     links.add(str);
                     check.add(str.substring(0,100));
-                    System.out.println(str);
+//                    System.out.println(str);
                 }
             }
         }

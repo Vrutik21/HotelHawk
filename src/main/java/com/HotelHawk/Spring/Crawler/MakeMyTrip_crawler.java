@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import com.HotelHawk.Spring.Parser.MakeMyTrip_parser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.JavascriptExecutor;
@@ -50,7 +51,7 @@ public class MakeMyTrip_crawler {
              // Parse the HTML using Jsoup
                 Document document = Jsoup.parse(html);
               //  System.out.println("document:" + document);
-                Hashtable<String,String[]> hb = parser.MakeMyTrip_Parser.Make_My_Trip_Parser(document, city);
+                Hashtable<String,String[]> hb = MakeMyTrip_parser.Make_My_Trip_Parser(document, city);
     	  
                 hs.put(city, hb);
             }
@@ -124,7 +125,7 @@ public class MakeMyTrip_crawler {
 
 	    
 
-}
+
 
 
 

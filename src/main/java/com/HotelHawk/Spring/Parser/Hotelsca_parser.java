@@ -31,6 +31,8 @@ public class Hotelsca_parser {
         ArrayList<String> temp_data=new ArrayList<>();
         for(String link:links){
             if(link!=null){
+                System.out.println("hotelsca");
+                System.out.println(link);
                 driver.get(link);
                 By locator= By.cssSelector(".uitk-text.uitk-type-300.uitk-text-default-theme.is-visually-hidden");
                 WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -86,17 +88,20 @@ public class Hotelsca_parser {
 //                }
 
                 //getting room prices, getting min price right now
-                int min=100000;
+                //int min=100000;
+                String str = "";
                 List<WebElement> pric=driver.findElements(By.cssSelector(".uitk-text.uitk-type-300.uitk-text-default-theme.is-visually-hidden"));
                 for(WebElement w:pric){
                     if (w.getText()!=""){
                         String t=w.getText();
                         String t_f=t.substring(t.lastIndexOf('$')+1);
-                        if(min>Integer.parseInt(t_f)){
-                            min=Integer.parseInt(t_f);
-                        }
+//                        if(min>Integer.parseInt(t_f)){
+//                            min=Integer.parseInt(t_f);
+//                        }
+                        str+=t_f;
                     }
                 }
+                temp_data.add(str);
             }
         }
         hotels.put(temp_data.get(0), temp_data);

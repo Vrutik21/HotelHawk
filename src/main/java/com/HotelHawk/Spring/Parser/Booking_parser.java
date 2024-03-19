@@ -1,3 +1,4 @@
+
 package com.HotelHawk.Spring.Parser;
 
 import netscape.javascript.JSObject;
@@ -54,10 +55,12 @@ public class Booking_parser {
                         }
                         System.out.println(min);
                         System.out.println("Available");
+                        temp_data.add(Integer.toString(min));
                     } else {
                         System.out.println("Not Available");
+                        temp_data.add(("Not Available"));
                     }
-                    temp_data.add(Integer.toString(min));
+                    //temp_data.add(Integer.toString(min));
                     ///reviews
                     String temp_reviews = "";
                     Elements reviews = d.getElementsByAttributeValueContaining("data-testid", "review-score-component");
@@ -108,4 +111,3 @@ public class Booking_parser {
         extract_hotels(links,checkin_out);
     }
 }
-

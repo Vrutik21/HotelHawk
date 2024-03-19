@@ -35,7 +35,7 @@ public class Hotelsca_crawler {
         }
         driver.quit();
 
-        System.out.println(linkss.size());
+//        System.out.println(linkss.size());
         save_links();
     }
     public static void save_links() throws FileNotFoundException {
@@ -52,7 +52,7 @@ public class Hotelsca_crawler {
         ///request is made to api stating the search city in search bar, crawler is called
         //just split url and add request city
         String request_city= "Toronto";
-        //String furl="https://ca.hotels.com/Hotel-Search?adults=2&d1=2024-03-21&d2=2024-03-22&destination=Toronto%2C%20Ontario%2C%20Canada&endDate=2024-03-09&flexibility=0_DAY&regionId=4089&rooms=1&semdtl=&sort=RECOMMENDED&startDate=2024-03-08&theme=&useRewards=false&userIntent=";
+        //String furl="https://ca.hotels.com/Hotel-Search?adults=2&d1=2024-05-21&d2=2024-05-22&destination=Toronto%2C%20Ontario%2C%20Canada&flexibility=0_DAY&regionId=4089&rooms=1&semdtl=&sort=RECOMMENDED&theme=&useRewards=false&userIntent=";
         //cities();
         save_links();
     }

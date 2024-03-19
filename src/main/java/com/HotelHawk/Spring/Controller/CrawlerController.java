@@ -15,12 +15,12 @@ public class CrawlerController {
 /// user give http reques with city name
     @RequestMapping("/booking_crawler")
     public void booking_crawl(String cityname) throws IOException {
-        Booking_crawler.extract_cities(SpellCheck.initialize(cityname));
+        Booking_crawler.extract_cities(cityname);
         Booking_parser.extract_links();
     }
     @RequestMapping("/hotel_crawler")
     public void hotel_crawl(String cityname) throws IOException, InterruptedException {
-        Hotelsca_crawler.cities(SpellCheck.initialize(cityname));
+        Hotelsca_crawler.cities(cityname);
         Hotelsca_parser.extract_links();
     }
     @RequestMapping("/mmt_crawler")
