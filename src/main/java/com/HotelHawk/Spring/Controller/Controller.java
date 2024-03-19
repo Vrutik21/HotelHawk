@@ -1,10 +1,12 @@
 package com.HotelHawk.Spring.Controller;
 
+import com.HotelHawk.Spring.WordCompletion.WordCompletion;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +16,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
+@CrossOrigin
 @org.springframework.stereotype.Controller
 
 public class Controller {
@@ -42,9 +46,15 @@ public class Controller {
         //SearchFrequencyController sc=new SearchFrequencyController();
     }
     @RequestMapping("/find/{cityname}")
-    public void find_city(@PathVariable String cityname){
-        WordCompletionCrawler wc= new WordCompletionCrawler();
-        wc.word_completion(cityname);
+    public HttpEntity<String> find_city(@PathVariable String cityname){
+//        WordCompletionCrawler wc= new WordCompletionCrawler();
+//        wc.word_completion(cityname);
+//        WordCompletion  wc=new WordCompletion(List.of("VANCOUVER", "TORONTO", "CALGARY"));
+        List<String> cities= WordCompletion.initialize(cityname);
+        String listString = String.join(", ", cities);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("MyResponseHeader", "value");
+        return new HttpEntity<>(listString, responseHeaders);
         ///getting search freq data
         //SearchFrequencyController sc=new SearchFrequencyController();
     }
