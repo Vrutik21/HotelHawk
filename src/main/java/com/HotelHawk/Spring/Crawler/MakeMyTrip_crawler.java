@@ -11,7 +11,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 
-public class MakeMyTrip_Crawler {
+public class MakeMyTrip_crawler {
 
 	
     public static Hashtable<String, Hashtable> extractCities(String url, String[] cities) throws FileNotFoundException {
