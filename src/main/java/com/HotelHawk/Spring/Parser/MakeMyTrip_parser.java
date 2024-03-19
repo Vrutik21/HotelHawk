@@ -1,5 +1,5 @@
+package com.HotelHawk.Spring.Parser;
 
-package parser;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
