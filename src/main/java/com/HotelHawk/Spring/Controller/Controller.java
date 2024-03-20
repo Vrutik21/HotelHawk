@@ -1,6 +1,7 @@
 package com.HotelHawk.Spring.Controller;
 
 import com.HotelHawk.Spring.WordCompletion.WordCompletion;
+import com.HotelHawk.Spring.spellcheck.SpellCheck;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -28,10 +29,11 @@ public class Controller {
     }
     @GetMapping("/search/{cityname}")
     public HttpEntity<String> crawl_all(@PathVariable String cityname) throws IOException, InterruptedException {
+        String fcityname= SpellCheck.initialize(cityname);
         //getting city name from HTTP Request
         CrawlerController c=new CrawlerController();
-        c.booking_crawl(cityname);
-        //c.hotel_crawl(cityname);
+        c.booking_crawl(fcityname);
+        //c.hotel_crawl(fcityname);
         String path = System.getProperty("user.dir");
         //System.out.println(path);
         File file=new File(path+"\\booking_json");
@@ -41,21 +43,16 @@ public class Controller {
         responseHeaders.set("MyResponseHeader", br.readLine());
         return new HttpEntity<>(temp, responseHeaders);
         //return ResponseEntity.ok().body(br.readLine());
-        //return br.readLine();
-        ///updating search frequency data
-        //SearchFrequencyController sc=new SearchFrequencyController();
+
     }
-    @RequestMapping("/find/{cityname}")
-    public HttpEntity<String> find_city(@PathVariable String cityname){
-//        WordCompletionCrawler wc= new WordCompletionCrawler();
-//        wc.word_completion(cityname);
-//        WordCompletion  wc=new WordCompletion(List.of("VANCOUVER", "TORONTO", "CALGARY"));
-        List<String> cities= WordCompletion.initialize(cityname);
-        String listString = String.join(", ", cities);
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("MyResponseHeader", "value");
-        return new HttpEntity<>(listString, responseHeaders);
-        ///getting search freq data
-        //SearchFrequencyController sc=new SearchFrequencyController();
-    }
+//    @RequestMapping("/find/{cityname}")
+//    public HttpEntity<String> find_city(@PathVariable String cityname){
+//        List<String> cities= WordCompletion.initialize(cityname);
+//        String listString = String.join(", ", cities);
+//        HttpHeaders responseHeaders = new HttpHeaders();
+//        responseHeaders.set("MyResponseHeader", "value");
+//        return new HttpEntity<>(listString, responseHeaders);
+//        ///getting search freq data
+//        //SearchFrequencyController sc=new SearchFrequencyController();
+//    }
 }

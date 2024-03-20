@@ -91,7 +91,7 @@ public class WordCompletion {
     public static List<String> initialize(String city){
         List<String> words = List.of("VANCOUVER", "TORONTO", "CALGARY");
         WordCompletion trie = new WordCompletion(words);
-        return trie.suggest("v".toUpperCase());
+        return trie.suggest(city.toUpperCase());
 
     }
     public static void main(String[] args) {

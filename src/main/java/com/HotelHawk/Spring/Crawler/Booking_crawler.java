@@ -1,6 +1,8 @@
 package com.HotelHawk.Spring.Crawler;
 
+import com.HotelHawk.Spring.FrequencyCount.FreqCount;
 import com.HotelHawk.Spring.Parser.Booking_parser;
+import com.HotelHawk.Spring.SearchFrequency.SearchFreq;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
