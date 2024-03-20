@@ -27,24 +27,24 @@ public class Controller {
     public String homepage(){
         return "index";
     }
-    @GetMapping("/search/{cityname}")
-    public HttpEntity<String> crawl_all(@PathVariable String cityname) throws IOException, InterruptedException {
-        String fcityname= SpellCheck.initialize(cityname);
-        //getting city name from HTTP Request
-        CrawlerController c=new CrawlerController();
-        c.booking_crawl(fcityname);
-        //c.hotel_crawl(fcityname);
-        String path = System.getProperty("user.dir");
-        //System.out.println(path);
-        File file=new File(path+"\\booking_json");
-        BufferedReader br=new BufferedReader(new FileReader(file));
-        String temp=br.readLine();
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("MyResponseHeader", br.readLine());
-        return new HttpEntity<>(temp, responseHeaders);
-        //return ResponseEntity.ok().body(br.readLine());
-
-    }
+//    @GetMapping("/search/{cityname}")
+//    public HttpEntity<String> crawl_all(@PathVariable String cityname) throws IOException, InterruptedException {
+//        String fcityname= SpellCheck.initialize(cityname);
+//        //getting city name from HTTP Request
+//        CrawlerController c=new CrawlerController();
+//        c.booking_crawl(fcityname);
+//        //c.hotel_crawl(fcityname);
+//        String path = System.getProperty("user.dir");
+//        //System.out.println(path);
+//        File file=new File(path+"\\finaldata");
+//        BufferedReader br=new BufferedReader(new FileReader(file));
+//        String temp=br.readLine();
+//        HttpHeaders responseHeaders = new HttpHeaders();
+//        responseHeaders.set("MyResponseHeader", br.readLine());
+//        return new HttpEntity<>(temp, responseHeaders);
+//        //return ResponseEntity.ok().body(br.readLine());
+//
+//    }
 //    @RequestMapping("/find/{cityname}")
 //    public HttpEntity<String> find_city(@PathVariable String cityname){
 //        List<String> cities= WordCompletion.initialize(cityname);

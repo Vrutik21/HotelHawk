@@ -11,12 +11,20 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Hotelsca_crawler {
-    public static String url="https://ca.hotels.com/Hotel-Search?adults=2&d1=2024-03-21&d2=2024-03-22&destination=Toronto%2C%20Ontario%2C%20Canada&endDate=2024-03-09&flexibility=0_DAY&regionId=4089&rooms=1&semdtl=&sort=RECOMMENDED&startDate=2024-03-08&theme=&useRewards=false&userIntent=";
     public static ArrayList<String> linkss =new ArrayList<String>();
     public static void cities(String cityname) throws IOException, InterruptedException {
+        HashMap<String,String> states= new HashMap<String,String>();
+        states.put("Toronto","Ontario");
+        states.put("Calgary","Alberta");
+        states.put("Vancouver","British%20Columbia");
+        states.put("Montreal","Quebec");
+        String url= "https://ca.hotels.com/Hotel-Search?adults=2&d1=2024-04-21&d2=2024-04-22&destination=".concat(cityname);
+        //String url=url_city.concat("%2C%20".concat(states.get(cityname)).concat("%2C%20Canada"));
+        System.out.println(url);
         WebDriver driver=new ChromeDriver();
         driver.get(url);
         driver.manage().window().maximize();
@@ -51,9 +59,9 @@ public class Hotelsca_crawler {
     public static void main(String[] args) throws IOException, InterruptedException {
         ///request is made to api stating the search city in search bar, crawler is called
         //just split url and add request city
-        String request_city= "Toronto";
+        //String request_city= "Toronto";
         //String furl="https://ca.hotels.com/Hotel-Search?adults=2&d1=2024-05-21&d2=2024-05-22&destination=Toronto%2C%20Ontario%2C%20Canada&flexibility=0_DAY&regionId=4089&rooms=1&semdtl=&sort=RECOMMENDED&theme=&useRewards=false&userIntent=";
         //cities();
-        save_links();
+        //save_links();
     }
 }

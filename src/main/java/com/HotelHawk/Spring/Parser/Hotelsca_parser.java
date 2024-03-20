@@ -1,5 +1,6 @@
 package com.HotelHawk.Spring.Parser;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -35,7 +36,7 @@ public class Hotelsca_parser {
                 System.out.println(link);
                 driver.get(link);
                 By locator= By.cssSelector(".uitk-text.uitk-type-300.uitk-text-default-theme.is-visually-hidden");
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
                 wait.until(ExpectedConditions.presenceOfElementLocated(locator));
 //                driver.manage().window().maximize();
 //                driver.wait(10000);
@@ -109,10 +110,19 @@ public class Hotelsca_parser {
 
     }
     public static void convert_json() throws FileNotFoundException {
-        JSONObject json=new JSONObject(hotels);
-        String json_string= json.toString();
+        JSONObject main_json=new JSONObject();
+        ArrayList<JSONObject> ar=new ArrayList<JSONObject>();
+        for(String s:hotels.keySet()){
+            JSONObject json=new JSONObject();
+            json.put("Name",hotels.get(s).get(0));
+            json.put("Image",hotels.get(s).get(1));
+            json.put("Review",hotels.get(s).get(2));
+            json.put("Price",hotels.get(s).get(3));
+            ar.add(json);
+        }
+        //main_json.put("Booking",new JSONArray(ar));
         PrintWriter pw= new PrintWriter("hotelsca_json");
-        pw.println(json_string);
+        pw.println(new JSONArray(ar).toString());
         pw.close();
     }
     public static void main(String[] args){
