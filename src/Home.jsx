@@ -1,8 +1,91 @@
+import NavBar from "./NavBar";
 import { BookingData } from "./shared/booking";
 import Slider from "react-slick";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import axios from "axios";
+import { useEffect } from "react";
+import Select from "react-select";
 
 const Home = () => {
-  let settings = {
+  const { register, handleSubmit, reset } = useForm();
+  const [responseData, setResponseData] = useState([]);
+  const [loader, setLoader] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("Hotels.ca");
+  const [searchData, setSearchData] = useState();
+  const [pollingData, setPollingData] = useState([]);
+  const [selectedDropdownOption, setDropdownOption] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  // const allHotels = [].concat(...Object.values(BookingData));
+
+  const getHotelsData = async (city) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/search/${city}`);
+      setResponseData(response.data);
+      reset();
+      setLoader(false);
+      console.log(response, "response");
+    } catch (error) {
+      reset();
+      setLoader(false);
+      console.error("Error fetching hotels data:", error);
+    }
+  };
+
+  const getSearchData = async () => {
+    if (searchData?.value) {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(
+          `http://localhost:8080/find/${searchData.value}`
+        );
+        setPollingData([{ label: response.data, value: response.data }]);
+        setIsLoading(false);
+        return response;
+      } catch (error) {
+        console.log("Error fetching search data: ", error);
+      }
+    }
+    setPollingData([]);
+  };
+
+  useEffect(() => {
+    // Start polling at intervals (e.g., every 1 second)
+    // const intervalId = setInterval(getSearchData);
+    getSearchData();
+
+    console.log(searchData, "useEffect");
+    // Cleanup function to stop polling when the component unmounts or when formData changes
+    // return () => clearInterval(intervalId);
+  }, [searchData]);
+
+  const handleInputChange = (value) => {
+    // if (value !== "") {
+    setSearchData({ value: value, label: value });
+    // }
+  };
+
+  const handleRegistration = (data) => {
+    setLoader(true);
+    console.log(data);
+    getHotelsData(data.city);
+    console.log(responseData, "response");
+  };
+
+  const handleWebsiteSelection = (option) => {
+    setSelectedOption(option);
+  };
+
+  const handleOptionSelect = (option) => {
+    setDropdownOption(option);
+    // console.log(option, "option");
+    if (option?.value !== "") {
+      setSearchData({ value: option.value, label: option.label });
+    }
+  };
+
+  // react-slick settings
+  const settings = {
     dots: true,
     arrows: false,
     autoplay: true,
@@ -15,100 +98,26 @@ const Home = () => {
   return (
     <div className="container-xxl bg-white p-0">
       {/* Spinner Start */}
-      {/* <div
-        id=""
-        className="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center"
-      >
+      {loader && (
         <div
-          className="spinner-border text-primary"
-          style={{ width: "3rem", height: "3rem" }}
-          role="status"
+          id=""
+          className="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center"
         >
-          <span className="sr-only">Loading...</span>
-        </div>
-      </div> */}
-      {/* Spinner End */}
-      {/* Navbar Start */}
-
-      <div className="container-fluid nav-bar bg-transparent">
-        <nav className="navbar navbar-expand-lg bg-white navbar-light py-0 px-4">
-          <a
-            href="index.html"
-            className="navbar-brand d-flex align-items-center text-center"
+          <div
+            className="spinner-border text-primary"
+            style={{
+              width: "3rem",
+              height: "3rem",
+            }}
+            role="status"
           >
-            <div className="icon p-2 me-2">
-              <img
-                className="img-fluid"
-                src="img/icon-deal.png"
-                alt="Icon"
-                style={{ width: 30, height: 30 }}
-              />
-            </div>
-            <h1 className="m-0 text-primary">Makaan</h1>
-          </a>
-          <button
-            type="button"
-            className="navbar-toggler"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarCollapse"
-          >
-            <span className="navbar-toggler-icon" />
-          </button>
-          <div className="collapse navbar-collapse" id="navbarCollapse">
-            <div className="navbar-nav ms-auto">
-              <a href="index.html" className="nav-item nav-link active">
-                Home
-              </a>
-              <a href="about.html" className="nav-item nav-link">
-                About
-              </a>
-              <div className="nav-item dropdown">
-                <a
-                  href="#"
-                  className="nav-link dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                >
-                  Property
-                </a>
-                <div className="dropdown-menu rounded-0 m-0">
-                  <a href="property-list.html" className="dropdown-item">
-                    Property List
-                  </a>
-                  <a href="property-type.html" className="dropdown-item">
-                    Property Type
-                  </a>
-                  <a href="property-agent.html" className="dropdown-item">
-                    Property Agent
-                  </a>
-                </div>
-              </div>
-              <div className="nav-item dropdown">
-                <a
-                  href="#"
-                  className="nav-link dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                >
-                  Pages
-                </a>
-                <div className="dropdown-menu rounded-0 m-0">
-                  <a href="testimonial.html" className="dropdown-item">
-                    Testimonial
-                  </a>
-                  <a href="404.html" className="dropdown-item">
-                    404 Error
-                  </a>
-                </div>
-              </div>
-              <a href="contact.html" className="nav-item nav-link">
-                Contact
-              </a>
-            </div>
-            <a href="" className="btn btn-primary px-3 d-none d-lg-flex">
-              Add Property
-            </a>
+            <span className="sr-only">Loading...</span>
           </div>
-        </nav>
-      </div>
+        </div>
+      )}
+      {/* Spinner End
+      {/* Navbar Start */}
+      <NavBar />
       {/* Navbar End */}
       {/* Header Start */}
       <div className="container-fluid header bg-white p-0">
@@ -147,231 +156,79 @@ const Home = () => {
         style={{ padding: 35 }}
       >
         <div className="container">
-          <div className="row g-2">
-            <div className="col-md-10">
-              <div className="row g-2">
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control border-0 py-3"
-                    placeholder="Search Keyword"
-                  />
-                </div>
-                <div className="col-md-4">
-                  <select className="form-select border-0 py-3">
-                    <option selected>Property Type</option>
-                    <option value={1}>Property Type 1</option>
-                    <option value={2}>Property Type 2</option>
-                    <option value={3}>Property Type 3</option>
-                  </select>
-                </div>
-                <div className="col-md-4">
-                  <select className="form-select border-0 py-3">
-                    <option selected>Location</option>
-                    <option value={1}>Location 1</option>
-                    <option value={2}>Location 2</option>
-                    <option value={3}>Location 3</option>
-                  </select>
+          <form onSubmit={handleSubmit(handleRegistration)}>
+            <div className="row g-2">
+              <div className="col-md-10">
+                <div className="row g-2">
+                  <div className="col-md-4">
+                    {/* <input
+                      type="text"
+                      name="city"
+                      {...register("city")}
+                      className="form-control border-0 py-3"
+                      placeholder="Search Keyword"
+                      onChange={handleInputChange}
+                      value={searchData}
+                    /> */}
+                    <Select
+                      id="inputField"
+                      value={selectedDropdownOption}
+                      onChange={handleOptionSelect}
+                      onInputChange={handleInputChange}
+                      // className="form-control border-0 py-3"
+                      options={pollingData}
+                      isLoading={isLoading}
+                      isSearchable
+                      placeholder="Search City"
+                      styles={{
+                        control: (provided) => ({
+                          ...provided,
+                          border: "none",
+                          borderRadius: "4px",
+                          minHeight: "55px",
+                        }),
+                        dropdownIndicator: () => ({
+                          display: "none",
+                        }),
+                        indicatorSeparator: () => ({
+                          display: "none",
+                        }),
+                        placeholder: (provided) => ({
+                          ...provided,
+                          color: "#666565",
+                        }),
+                      }}
+                    />
+                  </div>
+                  <div className="col-md-4">
+                    <select className="form-select border-0 py-3">
+                      <option selected>Property Type</option>
+                      <option value={1}>Property Type 1</option>
+                      <option value={2}>Property Type 2</option>
+                      <option value={3}>Property Type 3</option>
+                    </select>
+                  </div>
+                  <div className="col-md-4">
+                    <select className="form-select border-0 py-3">
+                      <option selected>Location</option>
+                      <option value={1}>Location 1</option>
+                      <option value={2}>Location 2</option>
+                      <option value={3}>Location 3</option>
+                    </select>
+                  </div>
                 </div>
               </div>
+              <div className="col-md-2">
+                <button className="btn btn-dark border-0 w-100 py-3">
+                  Search
+                </button>
+              </div>
             </div>
-            <div className="col-md-2">
-              <button className="btn btn-dark border-0 w-100 py-3">
-                Search
-              </button>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
       {/* Search End */}
-      {/* Category Start */}
-      <div className="container-xxl py-5">
-        <div className="container">
-          <div
-            className="text-center mx-auto mb-5 wow fadeInUp"
-            data-wow-delay="0.1s"
-            style={{ maxWidth: 600 }}
-          >
-            <h1 className="mb-3">Property Types</h1>
-            <p>
-              Eirmod sed ipsum dolor sit rebum labore magna erat. Tempor ut
-              dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed
-              rebum vero dolor duo.
-            </p>
-          </div>
-          <div className="row g-4">
-            <div
-              className="col-lg-3 col-sm-6 wow fadeInUp"
-              data-wow-delay="0.1s"
-            >
-              <a
-                className="cat-item d-block bg-light text-center rounded p-3"
-                href=""
-              >
-                <div className="rounded p-4">
-                  <div className="icon mb-3">
-                    <img
-                      className="img-fluid"
-                      src="img/icon-apartment.png"
-                      alt="Icon"
-                    />
-                  </div>
-                  <h6>Apartment</h6>
-                  <span>123 Properties</span>
-                </div>
-              </a>
-            </div>
-            <div
-              className="col-lg-3 col-sm-6 wow fadeInUp"
-              data-wow-delay="0.3s"
-            >
-              <a
-                className="cat-item d-block bg-light text-center rounded p-3"
-                href=""
-              >
-                <div className="rounded p-4">
-                  <div className="icon mb-3">
-                    <img
-                      className="img-fluid"
-                      src="img/icon-villa.png"
-                      alt="Icon"
-                    />
-                  </div>
-                  <h6>Villa</h6>
-                  <span>123 Properties</span>
-                </div>
-              </a>
-            </div>
-            <div
-              className="col-lg-3 col-sm-6 wow fadeInUp"
-              data-wow-delay="0.5s"
-            >
-              <a
-                className="cat-item d-block bg-light text-center rounded p-3"
-                href=""
-              >
-                <div className="rounded p-4">
-                  <div className="icon mb-3">
-                    <img
-                      className="img-fluid"
-                      src="img/icon-house.png"
-                      alt="Icon"
-                    />
-                  </div>
-                  <h6>Home</h6>
-                  <span>123 Properties</span>
-                </div>
-              </a>
-            </div>
-            <div
-              className="col-lg-3 col-sm-6 wow fadeInUp"
-              data-wow-delay="0.7s"
-            >
-              <a
-                className="cat-item d-block bg-light text-center rounded p-3"
-                href=""
-              >
-                <div className="rounded p-4">
-                  <div className="icon mb-3">
-                    <img
-                      className="img-fluid"
-                      src="img/icon-housing.png"
-                      alt="Icon"
-                    />
-                  </div>
-                  <h6>Office</h6>
-                  <span>123 Properties</span>
-                </div>
-              </a>
-            </div>
-            <div
-              className="col-lg-3 col-sm-6 wow fadeInUp"
-              data-wow-delay="0.1s"
-            >
-              <a
-                className="cat-item d-block bg-light text-center rounded p-3"
-                href=""
-              >
-                <div className="rounded p-4">
-                  <div className="icon mb-3">
-                    <img
-                      className="img-fluid"
-                      src="img/icon-building.png"
-                      alt="Icon"
-                    />
-                  </div>
-                  <h6>Building</h6>
-                  <span>123 Properties</span>
-                </div>
-              </a>
-            </div>
-            <div
-              className="col-lg-3 col-sm-6 wow fadeInUp"
-              data-wow-delay="0.3s"
-            >
-              <a
-                className="cat-item d-block bg-light text-center rounded p-3"
-                href=""
-              >
-                <div className="rounded p-4">
-                  <div className="icon mb-3">
-                    <img
-                      className="img-fluid"
-                      src="img/icon-neighborhood.png"
-                      alt="Icon"
-                    />
-                  </div>
-                  <h6>Townhouse</h6>
-                  <span>123 Properties</span>
-                </div>
-              </a>
-            </div>
-            <div
-              className="col-lg-3 col-sm-6 wow fadeInUp"
-              data-wow-delay="0.5s"
-            >
-              <a
-                className="cat-item d-block bg-light text-center rounded p-3"
-                href=""
-              >
-                <div className="rounded p-4">
-                  <div className="icon mb-3">
-                    <img
-                      className="img-fluid"
-                      src="img/icon-condominium.png"
-                      alt="Icon"
-                    />
-                  </div>
-                  <h6>Shop</h6>
-                  <span>123 Properties</span>
-                </div>
-              </a>
-            </div>
-            <div
-              className="col-lg-3 col-sm-6 wow fadeInUp"
-              data-wow-delay="0.7s"
-            >
-              <a
-                className="cat-item d-block bg-light text-center rounded p-3"
-                href=""
-              >
-                <div className="rounded p-4">
-                  <div className="icon mb-3">
-                    <img
-                      className="img-fluid"
-                      src="img/icon-luxury.png"
-                      alt="Icon"
-                    />
-                  </div>
-                  <h6>Garage</h6>
-                  <span>123 Properties</span>
-                </div>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Category End */}
+
       {/* About Start */}
       <div className="container-xxl py-5">
         <div className="container">
@@ -435,8 +292,9 @@ const Home = () => {
                     className="btn btn-outline-primary active"
                     data-bs-toggle="pill"
                     href="#tab-1"
+                    onClick={() => handleWebsiteSelection("Hotels.ca")}
                   >
-                    Featured
+                    Hotels.ca
                   </a>
                 </li>
                 <li className="nav-item me-2">
@@ -444,8 +302,9 @@ const Home = () => {
                     className="btn btn-outline-primary"
                     data-bs-toggle="pill"
                     href="#tab-2"
+                    onClick={() => handleWebsiteSelection("Bookings.ca")}
                   >
-                    For Sell
+                    Bookings.ca
                   </a>
                 </li>
                 <li className="nav-item me-0">
@@ -453,8 +312,9 @@ const Home = () => {
                     className="btn btn-outline-primary"
                     data-bs-toggle="pill"
                     href="#tab-3"
+                    onClick={() => handleWebsiteSelection("Makemytrip.com")}
                   >
-                    For Rent
+                    MakeMyTrip.com
                   </a>
                 </li>
               </ul>
@@ -463,7 +323,7 @@ const Home = () => {
           <div className="tab-content">
             <div id="tab-1" className="tab-pane fade show p-0 active">
               <div className="row g-4">
-                {BookingData.map((item) => (
+                {BookingData[selectedOption].map((item) => (
                   <div
                     className="col-lg-4 col-md-6 wow fadeInUp"
                     data-wow-delay="0.1s"
@@ -493,12 +353,6 @@ const Home = () => {
                             />
                           </div>
                         </Slider>
-                        <div className="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">
-                          For Sell
-                        </div>
-                        <div className="bg-white rounded-top text-primary position-absolute start-0 bottom-0 mx-4 pt-1 px-3">
-                          Appartment
-                        </div>
                       </div>
                       <div className="p-4 pb-0">
                         <h5 className="text-primary mb-3">${item.price}</h5>
