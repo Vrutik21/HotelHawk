@@ -1,6 +1,7 @@
 package com.HotelHawk.Spring.FrequencyCount;
 
 import org.checkerframework.checker.units.qual.A;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -48,7 +49,7 @@ public class FreqCount {
         for(String cityname:cities){
             String url= "https://ca.hotels.com/Hotel-Search?adults=2&d1=2024-04-21&d2=2024-04-22&destination=".concat(cityname).concat("%2C%20".concat(states.get(cityname)).concat("%2C%20Canada"));
             driver.get(url);
-            driver.manage().window().maximize();
+            driver.manage().window();
             Document doc= Jsoup.parse(driver.toString());
             String text= doc.text();
             int cnt = countOccurrences(text, cityname);
@@ -72,12 +73,16 @@ public class FreqCount {
         }
     }
     public static void save() throws FileNotFoundException {
-        JSONObject json=new JSONObject();
+
         PrintWriter pw= new PrintWriter("freqcount");
+        ArrayList<JSONObject> jsonarray =new ArrayList<JSONObject>();
         for(String s:count.keySet()){
-            json.put(s,(Integer.toString(count.get(s))));
+            JSONObject json=new JSONObject();
+            json.put("City",s);
+            json.put("FreqCount",Integer.toString(count.get(s)));
+            jsonarray.add(json);
         }
-        pw.println(json.toString());
+        pw.println(new JSONArray(jsonarray).toString());
         pw.close();
     }
     public static void main(String[] args) throws IOException {

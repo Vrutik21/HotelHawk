@@ -29,14 +29,15 @@ public class Hotelsca_parser {
     }
     public static void hotels_parse() throws IOException, InterruptedException {
         WebDriver driver =new FirefoxDriver();
-        ArrayList<String> temp_data=new ArrayList<>();
+
         for(String link:links){
+            ArrayList<String> temp_data=new ArrayList<>();
             if(link!=null){
                 System.out.println("hotelsca");
                 System.out.println(link);
                 driver.get(link);
                 By locator= By.cssSelector(".uitk-text.uitk-type-300.uitk-text-default-theme.is-visually-hidden");
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
                 wait.until(ExpectedConditions.presenceOfElementLocated(locator));
 //                driver.manage().window().maximize();
 //                driver.wait(10000);
@@ -99,20 +100,28 @@ public class Hotelsca_parser {
 //                        if(min>Integer.parseInt(t_f)){
 //                            min=Integer.parseInt(t_f);
 //                        }
-                        str+=t_f;
+                        str+=t_f+' ';
                     }
                 }
                 temp_data.add(str);
+                hotels.put(temp_data.get(0), temp_data);
             }
+
         }
-        hotels.put(temp_data.get(0), temp_data);
         convert_json();
 
     }
-    public static void convert_json() throws FileNotFoundException {
+    public static void convert_json() throws IOException {
         JSONObject main_json=new JSONObject();
         ArrayList<JSONObject> ar=new ArrayList<JSONObject>();
+        String fins="[";
         for(String s:hotels.keySet()){
+//            fins+="{";
+//            fins+="Name:".concat(hotels.get(s).get(0));
+//            fins+="Image".concat(hotels.get(s).get(1));
+//            fins+="Review".concat(hotels.get(s).get(2));
+//            fins+="Price".concat(hotels.get(s).get(3));
+//            fins+="}";
             JSONObject json=new JSONObject();
             json.put("Name",hotels.get(s).get(0));
             json.put("Image",hotels.get(s).get(1));
@@ -120,9 +129,11 @@ public class Hotelsca_parser {
             json.put("Price",hotels.get(s).get(3));
             ar.add(json);
         }
-        //main_json.put("Booking",new JSONArray(ar));
-        PrintWriter pw= new PrintWriter("hotelsca_json");
-        pw.println(new JSONArray(ar).toString());
+        fins+="]";
+        main_json.put("Booking",new JSONArray(ar));
+        String path = System.getProperty("user.dir");
+        PrintWriter pw= new PrintWriter(path+"\\hotelsca_json");
+        pw.println(main_json.toString());
         pw.close();
     }
     public static void main(String[] args){

@@ -13,8 +13,8 @@ import java.io.IOException;
 @RestController
 public class SearchFrequencyController {
     @GetMapping("/sf/getdata/")
-    public HttpEntity<String> search() throws IOException {
-        String data= SearchFreq.get_data();
+    public HttpEntity<String> search(String cityname) throws IOException {
+        String data= SearchFreq.get_data(cityname);
         System.out.println(data);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("MyResponseHeader", "value");

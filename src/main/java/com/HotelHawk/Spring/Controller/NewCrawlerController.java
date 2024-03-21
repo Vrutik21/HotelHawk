@@ -2,9 +2,11 @@ package com.HotelHawk.Spring.Controller;
 
 import com.HotelHawk.Spring.Crawler.Booking_crawler;
 import com.HotelHawk.Spring.Crawler.Hotelsca_crawler;
+import com.HotelHawk.Spring.Crawler.MakeMyTrip_crawler;
 import com.HotelHawk.Spring.MergerJSONdata.MergeData;
 import com.HotelHawk.Spring.Parser.Booking_parser;
 import com.HotelHawk.Spring.Parser.Hotelsca_parser;
+import com.HotelHawk.Spring.SearchFrequency.SearchFreq;
 import com.HotelHawk.Spring.spellcheck.SpellCheck;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,12 +25,14 @@ public class NewCrawlerController {
 /// user give http reques with city name
     @GetMapping("/newsearch/{cityname}")
     public HttpEntity<String> crawl_all(@PathVariable String cityname) throws IOException, InterruptedException {
+        SearchFreq.update(cityname);
         String fcityname= SpellCheck.initialize(cityname);
         //getting city name from HTTP Request
         booking_crawl(fcityname);
         hotel_crawl(fcityname);
+        mmt_crawl(fcityname);
         ///mergering data from crawlers into one json file.
-        MergeData.merge(cityname);
+        //MergeData.merge(cityname);
         String path = System.getProperty("user.dir");
         //System.out.println(path);
         File file=new File(path+"\\finaldata");
@@ -49,7 +53,9 @@ public class NewCrawlerController {
         Hotelsca_parser.extract_links();
     }
     @RequestMapping("/mmt_crawler")
-    public void mmt_crawl() throws IOException {
+    public void mmt_crawl(String cityname) throws IOException {
+        String[] city={cityname};
+        MakeMyTrip_crawler.extractCities(city);
     }
 }
 

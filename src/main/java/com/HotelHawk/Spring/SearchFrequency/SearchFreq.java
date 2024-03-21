@@ -8,15 +8,21 @@ import java.util.HashMap;
 
 public class SearchFreq {
     public static HashMap<String,Integer> map=new HashMap<String, Integer>();
-    public static String get_data() throws IOException {
+    public static String get_data(String cityname) throws IOException {
         File file=new File(System.getProperty("user.dir")+"\\searchfreq");
         BufferedReader br= new BufferedReader(new FileReader(file));
-        JSONObject json= new JSONObject();
+//        JSONObject json= new JSONObject();
         String s;
         while((s=br.readLine())!=null){
-            json.put(s.substring(0,s.lastIndexOf(':')),s.substring(s.lastIndexOf(':')+1,s.length()));
+//            System.out.println(s.substring(0,s.lastIndexOf(':')).toUpperCase());
+//            System.out.println(cityname.toUpperCase());
+//            System.out.println(s.substring(s.lastIndexOf(':')+1,s.length()));
+            if(s.substring(0,s.lastIndexOf(':')).toUpperCase().matches(cityname.toUpperCase())){
+                return (s.substring(s.lastIndexOf(':')+1,s.length()));
+            }
+
         }
-        return json.toString();
+        return "";
 
     }
     public static void update(String cityname) throws IOException {
@@ -59,6 +65,7 @@ public class SearchFreq {
         pw.println("Toronto:1");
         pw.println("Calgary:1");
         pw.close();
+
 
     }
     public static void main(String[] args) throws FileNotFoundException {

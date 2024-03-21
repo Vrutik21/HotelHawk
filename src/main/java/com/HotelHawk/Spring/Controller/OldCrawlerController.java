@@ -1,6 +1,7 @@
 package com.HotelHawk.Spring.Controller;
 
 import com.HotelHawk.Spring.MergerJSONdata.MergeData;
+import com.HotelHawk.Spring.SearchFrequency.SearchFreq;
 import com.HotelHawk.Spring.spellcheck.SpellCheck;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,7 @@ public class OldCrawlerController {
     @RequestMapping("/oldsearch/{cityname}")
     public HttpEntity<String> crawl_all(@PathVariable String cityname) throws IOException, InterruptedException {
         /// getting file from cityname_final_data
+        SearchFreq.update(cityname);
         String path = System.getProperty("user.dir").concat("\\").concat(cityname.toLowerCase());
         //System.out.println(path);
         File file=new File(path+"_finaldata");
