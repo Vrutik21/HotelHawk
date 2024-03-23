@@ -6,6 +6,7 @@ import com.HotelHawk.Spring.Crawler.MakeMyTrip_crawler;
 import com.HotelHawk.Spring.MergerJSONdata.MergeData;
 import com.HotelHawk.Spring.Parser.Booking_parser;
 import com.HotelHawk.Spring.Parser.Hotelsca_parser;
+import com.HotelHawk.Spring.Parser.MakeMyTrip_parser;
 import com.HotelHawk.Spring.SearchFrequency.SearchFreq;
 import com.HotelHawk.Spring.spellcheck.SpellCheck;
 import org.springframework.http.HttpEntity;
@@ -19,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Hashtable;
 
 @RestController
 public class NewCrawlerController {
@@ -55,7 +57,9 @@ public class NewCrawlerController {
     @RequestMapping("/mmt_crawler")
     public void mmt_crawl(String cityname) throws IOException {
         String[] city={cityname};
-        MakeMyTrip_crawler.extractCities(city);
+        Hashtable<String, Hashtable> t=MakeMyTrip_crawler.extractCities(city);
+        MakeMyTrip_parser.convert_json(t);
+
     }
 }
 

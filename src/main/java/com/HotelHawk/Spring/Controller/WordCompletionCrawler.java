@@ -1,5 +1,6 @@
 package com.HotelHawk.Spring.Controller;
 
+import com.HotelHawk.Spring.InvertedIndexing.InvertedIndex;
 import com.HotelHawk.Spring.SearchFrequency.SearchFreq;
 import com.HotelHawk.Spring.WordCompletion.WordCompletion;
 import org.json.JSONArray;
@@ -24,6 +25,7 @@ public class WordCompletionCrawler {
             JSONObject json=new JSONObject();
             json.put("Cityname", s);
             json.put("Search_Freq",SearchFreq.get_data(s));
+            json.put("Hotels", InvertedIndex.initialize(cityname.toUpperCase()));
             jsonarray.add(json);
         }
 

@@ -74,7 +74,7 @@ public class MergeData {
             writer.write(cf);
             writer.close();
 
-            PrintWriter p= new PrintWriter(cityname.concat("_finaldata"));
+            PrintWriter p= new PrintWriter(cityname.toLowerCase().concat("_finaldata"));
             p.println(cf);
             p.close();
 

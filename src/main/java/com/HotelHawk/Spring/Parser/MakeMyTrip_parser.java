@@ -72,7 +72,7 @@ public class MakeMyTrip_parser {
 			}
 		}
 		//  System.out.println(e.get(0).getElementsByAttributeValue("alt","hotelImg"));
-		save_links(links);
+		//save_links(links);
 		return hb;
 
 	}
@@ -104,8 +104,6 @@ public class MakeMyTrip_parser {
 				json.put("Price", alldetails[1]);
 				json.put("Review", alldetails[3]);
 				json.put("Images", alldetails[2]);
-
-
 				ar.add(json);
 
 			}

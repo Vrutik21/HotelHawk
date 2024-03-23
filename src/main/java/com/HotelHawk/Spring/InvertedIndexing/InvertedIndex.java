@@ -45,7 +45,7 @@ public class InvertedIndex {
         return current.hotelIds.subList(0, Math.min(limit, current.hotelIds.size()));
     }
 
-    public static void initialize(String cityname) {
+    public static String initialize(String cityname) {
         // Read hotel data from file and build inverted index
         InvertedIndex invertedIndex = new InvertedIndex();
         try (BufferedReader br = new BufferedReader(new FileReader("inverted_index_data"))) {
@@ -68,9 +68,12 @@ public class InvertedIndex {
         String searchQuery =cityname;
         List<String> torontoHotels = invertedIndex.search(searchQuery, 3);
         System.out.println("First 3 hotels in " + searchQuery + ":");
+        String temp="";
         for (String hotel : torontoHotels) {
             System.out.println(hotel);
+            temp+=hotel;
         }
+        return temp;
     }
     public static void main(String[] args) {
         initialize("Toronto".toUpperCase(Locale.ROOT));
