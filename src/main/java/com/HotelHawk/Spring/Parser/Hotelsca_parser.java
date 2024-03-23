@@ -130,10 +130,10 @@ public class Hotelsca_parser {
             ar.add(json);
         }
         fins+="]";
-        main_json.put("Booking",new JSONArray(ar));
+        //main_json.put("Booking",new JSONArray(ar));
         String path = System.getProperty("user.dir");
         PrintWriter pw= new PrintWriter(path+"\\hotelsca_json");
-        pw.println(main_json.toString());
+        pw.println(new JSONArray(ar).toString());
         pw.close();
     }
     public static void main(String[] args){

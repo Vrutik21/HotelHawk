@@ -12,18 +12,15 @@ import java.nio.file.Paths;
 public class MergeData {
     public static void merge(String cityname) throws IOException {
         File file1=new File(System.getProperty("user.dir")+"\\booking_json");
-        //File file2=new File(System.getProperty("user.dir")+"\\hotelsca_json");
-//        String text = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir")+"\\booking_json")), StandardCharsets.UTF_8);
-//        String str = text.replaceAll("\\\\", "");
-//        System.out.println(str);
-//        //JSONObject json=new JSONObject("{".concat(text).concat("}"));
-//        JSONObject main_json=new JSONObject();
-//        main_json.put("booking",text);
+        File file2=new File(System.getProperty("user.dir")+"\\hotelsca_json");
+        File file3=new File(System.getProperty("user.dir")+"\\MakeMy--Trip_json");
 
         BufferedReader br1=new BufferedReader(new FileReader(file1));
-        //BufferedReader br2=new BufferedReader(new FileReader(file2));
+        BufferedReader br2=new BufferedReader(new FileReader(file2));
+        BufferedReader br3=new BufferedReader(new FileReader(file3));
         String data1= (br1.readLine());
-        //String data2= (br2.readLine());
+        String data2= (br2.readLine());
+        String data3= (br3.readLine());
 
 //        JSONArray jsonArray = new JSONArray();
 //        JSONParser parser = new JSONParser();
@@ -31,8 +28,8 @@ public class MergeData {
 
         JSONObject json=new JSONObject();
         json.put("booking",data1);
-        //json.put("hotelsca",data2);
-        //json.put("mmt","data");
+        json.put("hotelsca",data2);
+        json.put("mmt",data3);
 
 //        ObjectMapper mapper = new ObjectMapper();
 //        InputStream is = Test.class.getResourceAsStream("/test.json");
@@ -68,8 +65,11 @@ public class MergeData {
 
             String mcontent = content.toString().replace("\\", " ");
             String c=mcontent.substring(0,mcontent.indexOf(":")+1).concat(mcontent.substring(mcontent.indexOf("["),mcontent.length()));
-            //String ch= c.substring()
-            String cf= c.substring(0,c.lastIndexOf("]")+1).concat(c.substring(c.lastIndexOf("]")+2));
+            int i= c.indexOf("hotelsca");
+            int j= c.indexOf("mmt");
+            String ch= c.substring(0,i-3).concat(c.substring(i-2,i+10)).concat(c.substring(i+11,c.length()));
+            String cj= ch.substring(0,j-3).concat(ch.substring(j-2,j+5)).concat(ch.substring(j+6,ch.length()));
+            String cf= cj.substring(0,cj.lastIndexOf("]")+1).concat(cj.substring(cj.lastIndexOf("]")+2));
 
             // Write the modified content back to the file
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));

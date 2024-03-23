@@ -32,7 +32,7 @@ public class NewCrawlerController {
         hotel_crawl(fcityname);
         mmt_crawl(fcityname);
         ///mergering data from crawlers into one json file.
-        //MergeData.merge(cityname);
+        MergeData.merge(cityname);
         String path = System.getProperty("user.dir");
         //System.out.println(path);
         File file=new File(path+"\\finaldata");
