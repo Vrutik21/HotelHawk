@@ -39,16 +39,14 @@ public class MergeData {
         BufferedWriter pw= new BufferedWriter(new FileWriter(System.getProperty("user.dir").concat("\\finaldata")));
         pw.write(json.toString());
         pw.close();
-        remove_overwrite();
+        remove_overwrite(cityname);
 //
 //
-//        //writing cityname_old data file
-//        PrintWriter p= new PrintWriter(cityname.concat("_finaldata"));
-//        p.println(json.toString());
-//        p.close();
+        //writing cityname_old data file
+
     }
 
-    public static void remove_overwrite(){
+    public static void remove_overwrite(String cityname){
         String filePath = System.getProperty("user.dir").concat("\\finaldata");
 
         try {
@@ -75,6 +73,10 @@ public class MergeData {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
             writer.write(cf);
             writer.close();
+
+            PrintWriter p= new PrintWriter(cityname.concat("_finaldata"));
+            p.println(cf);
+            p.close();
 
             System.out.println("File overwritten successfully.");
         } catch (IOException e) {

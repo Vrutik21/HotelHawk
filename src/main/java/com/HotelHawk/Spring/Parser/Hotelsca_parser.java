@@ -22,8 +22,13 @@ public class Hotelsca_parser {
         File file=new File("hotelsca_links");
         BufferedReader br=new BufferedReader(new FileReader(file));
         String st;
+        int count=0;
         while((st=br.readLine())!=null){
-            links.add(st);
+            if(count<10){
+                links.add(st);
+            }
+            count+=1;
+
         }
         hotels_parse();
     }
@@ -124,9 +129,11 @@ public class Hotelsca_parser {
 //            fins+="}";
             JSONObject json=new JSONObject();
             json.put("Name",hotels.get(s).get(0));
-            json.put("Image",hotels.get(s).get(1));
-            json.put("Review",hotels.get(s).get(2));
             json.put("Price",hotels.get(s).get(3));
+            json.put("Review",hotels.get(s).get(2));
+            json.put("Images",hotels.get(s).get(1));
+
+
             ar.add(json);
         }
         fins+="]";

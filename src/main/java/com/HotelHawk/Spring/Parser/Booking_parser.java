@@ -124,6 +124,7 @@ public class Booking_parser {
         ArrayList<JSONObject> ar=new ArrayList<JSONObject>();
         for(String s:hotels.keySet()){
             JSONObject json=new JSONObject();
+
             json.put("Name",hotels.get(s).get(0));
             json.put("Price",hotels.get(s).get(1));
             json.put("Review",hotels.get(s).get(2));

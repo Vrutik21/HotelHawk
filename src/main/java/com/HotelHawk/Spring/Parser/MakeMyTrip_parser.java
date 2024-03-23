@@ -101,9 +101,11 @@ public class MakeMyTrip_parser {
 				System.out.println(key1);
 				JSONObject json = new JSONObject();
 				json.put("Name", key1);
-				json.put("Image", alldetails[2]);
-				json.put("Review", alldetails[3]);
 				json.put("Price", alldetails[1]);
+				json.put("Review", alldetails[3]);
+				json.put("Images", alldetails[2]);
+
+
 				ar.add(json);
 
 			}
