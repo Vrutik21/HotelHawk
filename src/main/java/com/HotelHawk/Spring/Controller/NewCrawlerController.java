@@ -30,8 +30,8 @@ public class NewCrawlerController {
         System.out.println(checkin_date);
 
 
-        booking_crawl(fcityname,checkin_date,checkout_date);
-        hotel_crawl(fcityname,checkin_date,checkout_date);
+        //booking_crawl(fcityname,checkin_date,checkout_date);
+        //hotel_crawl(fcityname,checkin_date,checkout_date);
         mmt_crawl(fcityname,checkin_date,checkout_date);
 
 
