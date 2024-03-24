@@ -67,7 +67,9 @@ public class Booking_parser {
                             System.out.println(min);
                             System.out.println("Available");
                             temp_data.add(Integer.toString(min));
-                        } else {
+                        }
+                        else {
+
                             System.out.println("Not Available");
                             temp_data.add(("Not Available"));
                         }

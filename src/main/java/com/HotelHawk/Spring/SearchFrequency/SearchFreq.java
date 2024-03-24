@@ -64,6 +64,14 @@ public class SearchFreq {
         PrintWriter pw= new PrintWriter("searchfreq");
         pw.println("Toronto:1");
         pw.println("Calgary:1");
+        pw.println("Montreal:1");
+        pw.println("Ottawa:1");
+        pw.println("Vancouver:1");
+        pw.println("Hamilton:1");
+        pw.println("Edmonton:1");
+        pw.println("Winnipeg:1");
+        pw.println("Windsor:1");
+        pw.println("Halifax:1");
         pw.close();
 
 

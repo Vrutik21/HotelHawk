@@ -53,11 +53,19 @@ public class PageRank {
         photos.put("Calgary","https://cf.bstatic.com/xdata/images/city/600x600/653231.jpg?k=526fe3dd8fc78cbaccaee3be9e675b624e73b666ab757ecb0ebf31c7f7d96264&o=");
         photos.put("Toronto","https://cf.bstatic.com/xdata/images/city/600x600/971990.jpg?k=6d52fe4a57a984e2d540e3d7a1910f8a76fda3a57708faddd74e2109c3344b5e&o=");
         photos.put("Vancouver","https://q-xx.bstatic.com/xdata/images/city/170x136/653281.jpg?k=f290f027412c3954eba82a85cf40eaa703bcbb30b67fa5f2087c7db1eb406262&o=");
+        photos.put("Montreal","");
+        photos.put("Ottawa","");
+        photos.put("Hamilton","");
+        photos.put("Edmonton","");
+        photos.put("Winnipeg","");
+        photos.put("Windsor","");
+        photos.put("Halifax","");
+
         ArrayList<String> data=new ArrayList<String>();
         PrintWriter pw= new PrintWriter("pagerank");
         int count=0;
         pw.println("{");
-        while(count<3){
+        while(count<5){
             int polls=pQueue.poll();
 
             for(String s:inverted_map.get(polls)){

@@ -26,7 +26,7 @@ public class Booking_crawler {
 
         for(Element l:e){
             String str =l.attr("href");
-            if (links.size()<10){
+            if (links.size()<15){
                 if (!check.contains(str.substring(0,100))){
                     links.add(str);
                     check.add(str.substring(0,100));
