@@ -5,6 +5,7 @@ import com.HotelHawk.Spring.SearchFrequency.SearchFreq;
 import com.HotelHawk.Spring.spellcheck.SpellCheck;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,7 @@ import java.io.IOException;
 
 @RestController
 public class OldCrawlerController {
+    @CrossOrigin
     @RequestMapping("/oldsearch/{cityname}")
     public HttpEntity<String> crawl_all(@PathVariable String cityname) throws IOException, InterruptedException {
         /// getting file from cityname_final_data

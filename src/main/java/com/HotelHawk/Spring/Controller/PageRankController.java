@@ -2,6 +2,7 @@ package com.HotelHawk.Spring.Controller;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 
 @RestController
 public class PageRankController {
+    @CrossOrigin
     @RequestMapping("/pg/")
     public static HttpEntity<String> pgrank() throws IOException {
         File file=new File(System.getProperty("user.dir")+"\\pagerank");

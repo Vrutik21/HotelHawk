@@ -11,10 +11,7 @@ import com.HotelHawk.Spring.SearchFrequency.SearchFreq;
 import com.HotelHawk.Spring.spellcheck.SpellCheck;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,6 +22,7 @@ import java.util.Hashtable;
 @RestController
 public class NewCrawlerController {
 /// user give http reques with city name
+    @CrossOrigin
     @RequestMapping("/newsearch/{cityname}/{checkin_date}/{checkout_date}")
     public HttpEntity<String> crawl_all(@PathVariable String cityname, @PathVariable String checkin_date, @PathVariable String checkout_date) throws IOException, InterruptedException {
         SearchFreq.update(cityname);

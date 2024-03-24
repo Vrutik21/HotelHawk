@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,7 @@ import java.util.Locale;
 
 @RestController
 public class WordCompletionCrawler {
+    @CrossOrigin
     @RequestMapping("/find/{cityname}")
     public HttpEntity<String> find_city(@PathVariable String cityname) throws IOException {
         List<String> cities= WordCompletion.initialize(cityname);
