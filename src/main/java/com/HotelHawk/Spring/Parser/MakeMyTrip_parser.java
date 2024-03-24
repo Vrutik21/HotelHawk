@@ -17,7 +17,6 @@ import org.openqa.selenium.WebDriver;
 
 
 public class MakeMyTrip_parser {
-
 	public static Hashtable<String,String[]> Make_My_Trip_Parser(Document document,String city) throws FileNotFoundException
 	{
 
@@ -32,7 +31,7 @@ public class MakeMyTrip_parser {
 
 		for(Element l:e){
 			// Getting links for the hotel
-			String[] hoteldetails = new String[4];
+			String[] hoteldetails = new String[6];
 
 			String str1 = l.firstChild().attr("href");
 			if (!links.contains(str1)){
@@ -55,12 +54,31 @@ public class MakeMyTrip_parser {
 				price.add(str3);
 				hoteldetails[1]=str3;
 				// System.out.println(str3);
+
+				String str5 = l.getElementsByClass("blueText").text();
+				// str5.substring(0,str5.indexOf("login"));
+				hoteldetails[4]=str5.substring(0,str5.indexOf("Login"));
 			}
 
 			//saving the images of the hotels
+
+
 			String str4 = l.getElementsByAttributeValue("alt","hotelImg").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_1").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_2").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_3").attr("src");
+//
+
+			//System.out.println(str4);
 			String str5 =  l.getElementsByAttributeValue("itemprop","ratingValue").text();
 
+			Elements aminites = l.getElementsByClass("pc__amenity");
+
+
+			String str6 ="";
+
+			for(Element add : aminites)
+			{
+				str6=str6.concat(add.text()+", ");
+			}
+			hoteldetails[5]=str6;
 			hoteldetails[2]=str4;
 			hoteldetails[3]=str5;
 
@@ -72,14 +90,14 @@ public class MakeMyTrip_parser {
 			}
 		}
 		//  System.out.println(e.get(0).getElementsByAttributeValue("alt","hotelImg"));
-		//save_links(links);
+		save_links(links);
 		return hb;
 
 	}
 	public static void save_links(ArrayList<String> links) throws FileNotFoundException {
 		//System.out.println("https://www.booking.com/hotel/ca/days-inn-toronto-downtown.en-gb.html?label=gen173nr-1FCBcoggI46AdIM1gEaCeIAQGYAQm4ARfIAQzYAQHoAQH4AQmIAgGoAgO4Apntzq8GwAIB0gIkZWMxZTk2NDItNmMxMi00YTFiLTliOTYtMDAwNGYxZmFlOTAz2AIG4AIB&aid=304142&ucfs=1&arphpl=1&dest_id=-574890&dest_type=city&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=5182138d13ba0087&srepoch=1710470811&from_sustainable_property_sr=1&from=searchresults".length());
 		String path = System.getProperty("user.dir");
-		PrintWriter pr = new PrintWriter(path+"hotelsca_links");
+		PrintWriter pr = new PrintWriter(path+"mmt_links");
 		for (int i=0; i<links.size() ; i++){
 			pr.println(links.get(i));
 		}
@@ -98,18 +116,19 @@ public class MakeMyTrip_parser {
 			while (yy.hasMoreElements()) {
 				String key1 = yy.nextElement();
 				String[] alldetails = jj.get(key1);
-				System.out.println(key1);
 				JSONObject json = new JSONObject();
 				json.put("Name", key1);
 				json.put("Price", alldetails[1]);
 				json.put("Review", alldetails[3]);
 				json.put("Images", alldetails[2]);
+				json.put("location",alldetails[4]);
+				json.put("aminities",alldetails[5]);
 				ar.add(json);
 
 			}
 			//main_json.put("Make_My_Trip",new JSONArray(ar));
 			String path = System.getProperty("user.dir");
-			PrintWriter pw= new PrintWriter(path+"\\MakeMy--Trip_json");
+			PrintWriter pw= new PrintWriter(path+"\\MakeMyTrip_json");
 			pw.println(new JSONArray(ar).toString());
 			pw.close();
 			// Print and display the Rank and Name

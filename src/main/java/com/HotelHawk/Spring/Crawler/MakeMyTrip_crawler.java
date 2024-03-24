@@ -14,14 +14,16 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class MakeMyTrip_crawler {
 
-    public static Hashtable<String, Hashtable> extractCities(String[] cities) throws FileNotFoundException {
+    public static Hashtable<String, Hashtable> extractCities(String[] cities,String checkin,String checkout) throws FileNotFoundException {
         Hashtable<String,Hashtable> hs = new Hashtable<>();
+        String[] incheck = checkin.split("-");
+        String[] outcheck=checkout.split("-");
         for (String city : cities) {
             // Create a new instance of the Chrome driver
             WebDriver driver = new ChromeDriver();
 
             // Open a website using Selenium
-            driver.get("https://www.makemytrip.com/hotels/hotel-listing/?checkin=03242024&city=CT" +city.substring(0, 5).toUpperCase()+ "&checkout=03292024&roomStayQualifier=2e0e&locusId=CT"+city.substring(0, 5).toUpperCase()+"&country=CAN&locusType=city&searchText="+city+"&regionNearByExp=3&rsc=1e2e0e");
+            driver.get("https://www.makemytrip.com/hotels/hotel-listing/?checkin="+incheck[1]+""+incheck[2]+""+incheck[0]+"&city=CT" +city.substring(0, 5).toUpperCase()+ "&checkout="+outcheck[1]+""+outcheck[2]+""+outcheck[0]+"&roomStayQualifier=2e0e&locusId=CT"+city.substring(0, 5).toUpperCase()+"&country=CAN&locusType=city&searchText="+city+"&regionNearByExp=3&rsc=1e2e0e");
 
             // wait for 5 seconds for the page to load
             //driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
@@ -63,8 +65,9 @@ public class MakeMyTrip_crawler {
                 "Toronto",
                 //"Windsor"
         };
-
-        Hashtable<String,Hashtable> js = extractCities(cities);
+        String checkindate = "2024-05-23";
+        String checkoutdate="2024-05-27";
+        Hashtable<String,Hashtable> js = extractCities(cities,checkindate,checkoutdate);
         MakeMyTrip_parser.convert_json(js);
     }
 }

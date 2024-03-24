@@ -16,13 +16,14 @@ import java.util.List;
 
 public class Hotelsca_crawler {
     public static ArrayList<String> linkss =new ArrayList<String>();
-    public static void cities(String cityname) throws IOException, InterruptedException {
+    public static void cities(String cityname,String checkin_date, String checkout_date) throws IOException, InterruptedException {
         HashMap<String,String> states= new HashMap<String,String>();
-        states.put("Toronto","Ontario");
-        states.put("Calgary","Alberta");
-        states.put("Vancouver","British%20Columbia");
-        states.put("Montreal","Quebec");
-        String url= "https://ca.hotels.com/Hotel-Search?adults=2&d1=2024-04-21&d2=2024-04-22&destination=".concat(cityname);
+        states.put("toronto","Ontario");
+        states.put("calgary","Alberta");
+        states.put("vancouver","British%20Columbia");
+        states.put("montreal","Quebec");
+        System.out.println(checkin_date);
+        String url= ((((("https://ca.hotels.com/Hotel-Search?adults=2&d1=".concat(checkin_date)).concat("&d2=")).concat(checkout_date)).concat("&destination=")).concat(cityname)).concat("%2C%20".concat(states.get(cityname.toLowerCase())).concat("%2C%20Canada"));
         //String url=url_city.concat("%2C%20".concat(states.get(cityname)).concat("%2C%20Canada"));
         System.out.println(url);
         WebDriver driver=new ChromeDriver();
@@ -57,6 +58,8 @@ public class Hotelsca_crawler {
 
     }
     public static void main(String[] args) throws IOException, InterruptedException {
+        //cities("Toronto");
+        //Hotelsca_parser.extract_links();
         ///request is made to api stating the search city in search bar, crawler is called
         //just split url and add request city
         //String request_city= "Toronto";

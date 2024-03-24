@@ -68,12 +68,12 @@ public class InvertedIndex {
         String searchQuery =cityname;
         List<String> torontoHotels = invertedIndex.search(searchQuery, 3);
         System.out.println("First 3 hotels in " + searchQuery + ":");
-        String temp="";
+        String f_temp="";
         for (String hotel : torontoHotels) {
             System.out.println(hotel);
-            temp+=hotel;
+            f_temp+=hotel.concat(" ");
         }
-        return temp;
+        return f_temp;
     }
     public static void main(String[] args) {
         initialize("Toronto".toUpperCase(Locale.ROOT));

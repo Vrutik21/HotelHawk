@@ -25,16 +25,22 @@ import java.util.Hashtable;
 @RestController
 public class NewCrawlerController {
 /// user give http reques with city name
-    @GetMapping("/newsearch/{cityname}")
-    public HttpEntity<String> crawl_all(@PathVariable String cityname) throws IOException, InterruptedException {
+    @RequestMapping("/newsearch/{cityname}/{checkin_date}/{checkout_date}")
+    public HttpEntity<String> crawl_all(@PathVariable String cityname, @PathVariable String checkin_date, @PathVariable String checkout_date) throws IOException, InterruptedException {
         SearchFreq.update(cityname);
         String fcityname= SpellCheck.initialize(cityname);
-        //getting city name from HTTP Request
-        booking_crawl(fcityname);
-        hotel_crawl(fcityname);
-        mmt_crawl(fcityname);
+        System.out.println(checkin_date);
+
+
+        booking_crawl(fcityname,checkin_date,checkout_date);
+        hotel_crawl(fcityname,checkin_date,checkout_date);
+        mmt_crawl(fcityname,checkin_date,checkout_date);
+
+
         ///mergering data from crawlers into one json file.
         MergeData.merge(cityname);
+
+
         String path = System.getProperty("user.dir");
         //System.out.println(path);
         File file=new File(path+"\\finaldata");
@@ -44,20 +50,26 @@ public class NewCrawlerController {
         responseHeaders.set("MyResponseHeader", br.readLine());
         return new HttpEntity<>(temp, responseHeaders);
     }
+
+
     @RequestMapping("/booking_crawler")
-    public void booking_crawl(String cityname) throws IOException {
+    public void booking_crawl(String cityname, String checkin_date, String checkout_date) throws IOException {
         Booking_crawler.extract_cities(cityname);
-        Booking_parser.extract_links(cityname);
+        Booking_parser.initialize(cityname,checkin_date,checkout_date);
     }
+
+
     @RequestMapping("/hotel_crawler")
-    public void hotel_crawl(String cityname) throws IOException, InterruptedException {
-        Hotelsca_crawler.cities(cityname);
-        Hotelsca_parser.extract_links();
+    public void hotel_crawl(String cityname,String checkin_date, String checkout_date) throws IOException, InterruptedException {
+        Hotelsca_crawler.cities(cityname, checkin_date,checkout_date);
+        Hotelsca_parser.extract_links(checkin_date,checkout_date);
     }
+
+
     @RequestMapping("/mmt_crawler")
-    public void mmt_crawl(String cityname) throws IOException {
+    public void mmt_crawl(String cityname,String checkin_date, String checkout_date) throws IOException {
         String[] city={cityname};
-        Hashtable<String, Hashtable> t=MakeMyTrip_crawler.extractCities(city);
+        Hashtable<String, Hashtable> t=MakeMyTrip_crawler.extractCities(city,checkin_date,checkout_date);
         MakeMyTrip_parser.convert_json(t);
 
     }

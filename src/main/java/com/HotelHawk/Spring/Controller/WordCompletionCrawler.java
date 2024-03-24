@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 public class WordCompletionCrawler {
@@ -25,7 +26,7 @@ public class WordCompletionCrawler {
             JSONObject json=new JSONObject();
             json.put("Cityname", s);
             json.put("Search_Freq",SearchFreq.get_data(s));
-            json.put("Hotels", InvertedIndex.initialize(cityname.toUpperCase()));
+            json.put("Hotels", InvertedIndex.initialize(s.toUpperCase()));
             jsonarray.add(json);
         }
 

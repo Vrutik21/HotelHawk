@@ -14,19 +14,26 @@ import org.springframework.web.servlet.tags.ArgumentAware;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Booking_parser {
-    public static String checkin_out="&checkin=2024-03-21&checkout=2024-03-22&dest_id=-574890&dest_type=city";
+    //public static String checkin_out="&checkin=2024-03-21&checkout=2024-03-22&dest_id=-574890&dest_type=city";
     public static ArrayList<String> links= new ArrayList<String>();
     public static HashMap<String,ArrayList<String>> hotels=new HashMap<String,ArrayList<String>>();
-    public static void extract_links(String cityname) throws IOException {
+
+    public static void initialize(String cityname, String checkin_in, String checkin_out) throws IOException {
+        String url="&checkin=".concat(checkin_in).concat("&checkout=").concat(checkin_out).concat("&dest_id=-574890&dest_type=city");
+        extract_links(cityname,url);
+    }
+    public static void extract_links(String cityname, String url) throws IOException {
         File file=new File("booking_links");
         BufferedReader br=new BufferedReader(new FileReader(file));
         String st;
         while((st=br.readLine())!=null){
             links.add(st);
         }
-        extract_hotels(links, checkin_out,cityname);
+        extract_hotels(links, url,cityname);
     }
     public static void extract_hotels(ArrayList<String> links, String checkin_out, String cityname) throws IOException {
 
@@ -99,6 +106,37 @@ public class Booking_parser {
                             temp_imgs += img_link + " ";
                         }
                         temp_data.add(temp_imgs);
+
+                        //getting location
+                        Elements fl= d.getElementsByClass("\n" +
+                                "hp_address_subtitle\n" +
+                                "js-hp_address_subtitle\n" +
+                                "jq_tooltip\n");
+                        for(Element el:fl){
+                            System.out.println(el.text());
+                            temp_data.add(el.text());
+                        }
+
+
+                        String facilities="";
+                        Elements faci= d.getElementsByAttributeValue("data-testid","property-most-popular-facilities-wrapper");
+                        for(Element l: faci){
+                            Elements list= l.getElementsByClass("a5a5a75131");
+                            for(Element el:list){
+                                String input= (el.text());
+                                String[] lines = input.split("\n");
+                                Set<String> uniqueLinesSet = new HashSet<>();
+
+                                for (String line : lines) {
+                                    uniqueLinesSet.add(line);
+                                }
+                                facilities= String.join(", ", uniqueLinesSet);
+                            }
+                        }
+                        temp_data.add(facilities);
+
+
+
                         hotels.put(temp_data.get(0),temp_data);
                     }
             }
@@ -114,7 +152,7 @@ public class Booking_parser {
             names.add(s);
         }
         PrintWriter pw= new PrintWriter("inverted_index_data");
-        pw.println(cityname.concat(":").concat(String.join(", ", names)));
+        pw.println(cityname.concat(": ").concat(String.join(", ", names)));
         pw.close();
 
     }
@@ -126,9 +164,11 @@ public class Booking_parser {
             JSONObject json=new JSONObject();
 
             json.put("Name",hotels.get(s).get(0));
-            json.put("Price",hotels.get(s).get(1));
+            json.put("MinPrice",hotels.get(s).get(1));
             json.put("Review",hotels.get(s).get(2));
             json.put("Images",hotels.get(s).get(3));
+            json.put("Location", hotels.get(s).get(4));
+            json.put("Facilities", hotels.get(s).get(5));
             ar.add(json);
         }
         //main_json.put("Booking",new JSONArray(ar));
