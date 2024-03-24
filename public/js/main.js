@@ -76,6 +76,45 @@
             }
         }
     });
+
+    // datepicker.js
+
+    $(function(){
+        $('#datepicker').datepicker();
+      });
+      let startDate = document.getElementById('startDate')
+        let endDate = document.getElementById('endDate')
+
+        startDate.addEventListener('change',(e)=>{
+        let startDateVal = e.target.value
+        document.getElementById('startDateSelected').innerText = startDateVal
+        })
+
+        endDate.addEventListener('change',(e)=>{
+        let endDateVal = e.target.value
+        document.getElementById('endDateSelected').innerText = endDateVal
+        })  
+
+
+        // // Function to show more team members
+        //     function showMoreMembers() {
+        //         // Get the extra team members
+        //         var extraMembers = document.querySelectorAll('.extra-member');
+            
+        //         // Toggle the visibility of extra members
+        //         extraMembers.forEach(function(member) {
+        //         member.classList.toggle('d-none');
+        //         });
+            
+        //         // Change button text based on visibility
+        //         var buttonText = document.getElementById('showMoreButton').querySelector('button');
+        //         if (buttonText.innerText === 'Show More') {
+        //         buttonText.innerText = 'Show Less';
+        //         } else {
+        //         buttonText.innerText = 'Show More';
+        //         }
+        //     }
+  
     
 })(jQuery);
 
