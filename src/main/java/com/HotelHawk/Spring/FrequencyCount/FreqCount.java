@@ -29,7 +29,8 @@ public class FreqCount {
     }
     public static void fc_booking(ArrayList<String> cities) throws IOException {
         for(String cityname:cities){
-            String t="https://www.booking.com//".concat(cityname).concat("Canada");
+            String url="https://www.booking.com//";
+            String t=url+"/"+cityname+"-"+"Canada";
             Connection con= Jsoup.connect(t);
             Document doc=con.get();
             String text= doc.text();
@@ -47,7 +48,7 @@ public class FreqCount {
     public static void fc_hotels(ArrayList<String> cities){
         WebDriver driver=new ChromeDriver();
         for(String cityname:cities){
-            String url= "https://ca.hotels.com/Hotel-Search?adults=2&d1=2024-04-21&d2=2024-04-22&destination=".concat(cityname).concat("%2C%20".concat(states.get(cityname)).concat("%2C%20Canada"));
+            String url= "https://ca.hotels.com/Hotel-Search?adults=2&d1=2024-04-21&d2=2024-04-22&destination=".concat(cityname.toLowerCase()).concat("%2C%20".concat(states.get(cityname.toLowerCase())).concat("%2C%20Canada"));
             driver.get(url);
             driver.manage().window();
             Document doc= Jsoup.parse(driver.toString());
@@ -88,13 +89,26 @@ public class FreqCount {
     public static void main(String[] args) throws IOException {
         ArrayList<String> cities=new ArrayList<String>();
         cities.add("Toronto");
-        states.put("Toronto","Ontario");
+        states.put("toronto","Ontario");
         cities.add("Calgary");
-        states.put("Calgary","Alberta");
+        states.put("calgary","Alberta");
         cities.add("Vancouver");
-        states.put("Vancouver","British%20Columbia");
+        states.put("vancouver","British%20Columbia");
         cities.add("Montreal");
-        states.put("Montreal","Quebec");
+        states.put("montreal","Quebec");
+        cities.add("OTTAWA");
+        states.put("ottawa","Ontario");
+        cities.add("WINDSOR");
+        states.put("windsor","Ontario");
+        cities.add("HALIFAX");
+        states.put("halifax","Ontario");
+        cities.add("WINNIPEG");
+        states.put("winnipeg","Ontario");
+        cities.add("EDMONTON");
+        states.put("edmonton","Ontario");
+        cities.add("HAMILTON");
+        states.put("hamilton","Ontario");
+
         fc_booking(cities);
         fc_hotels(cities);
         print();

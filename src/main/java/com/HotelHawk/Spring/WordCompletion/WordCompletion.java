@@ -89,13 +89,13 @@ public class WordCompletion {
         return list;
     }
     public static List<String> initialize(String city){
-        List<String> words = List.of("VANCOUVER", "TORONTO", "CALGARY");
+        List<String> words = List.of("VANCOUVER", "TORONTO", "CALGARY", "MONTREAL", "OTTAWA", "WINDSOR","HALIFAX", "WINNIPEG", "EDMONTON", "HAMILTON");
         WordCompletion trie = new WordCompletion(words);
         return trie.suggest(city.toUpperCase());
 
     }
     public static void main(String[] args) {
-        List<String> words = List.of("VANCOUVER", "TORONTO", "CALGARY");
+        List<String> words = List.of("VANCOUVER", "TORONTO", "CALGARY", "MONTREAL", "OTTAWA", "WINDSOR","HALIFAX", "WINNIPEG", "EDMONTON", "HAMILTON");
         WordCompletion trie = new WordCompletion(words);
         //return trie.suggest(cityname.toUpperCase());
         System.out.println(trie.suggest("v".toUpperCase()));

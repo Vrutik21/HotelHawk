@@ -18,6 +18,10 @@ public class SpellCheck {
         cities.add("VANCOUVER");
         cities.add("MONTREAL");
         cities.add("WINDSOR");
+        cities.add("HALIFAX");
+        cities.add("WINNIPEG");
+        cities.add("EDMONTON");
+        cities.add("HAMILTON");
         return edit_distance(cityname.toUpperCase());
     }
     static int min(int x, int y, int z)
