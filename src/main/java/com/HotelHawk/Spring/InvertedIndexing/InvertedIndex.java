@@ -71,7 +71,7 @@ public class InvertedIndex {
         String f_temp="";
         for (String hotel : torontoHotels) {
             System.out.println(hotel);
-            f_temp+=hotel.concat(" ");
+            f_temp+=hotel.concat(",");
         }
         return f_temp;
     }

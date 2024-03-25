@@ -22,7 +22,8 @@ public class OldCrawlerController {
     public HttpEntity<String> crawl_all(@PathVariable String cityname) throws IOException, InterruptedException {
         /// getting file from cityname_final_data
         SearchFreq.update(cityname);
-        String path = System.getProperty("user.dir").concat("\\").concat(cityname.toLowerCase());
+        String fcityname= SpellCheck.initialize(cityname);
+        String path = System.getProperty("user.dir").concat("\\").concat(fcityname.toLowerCase());
         //System.out.println(path);
         File file=new File(path+"_finaldata");
         BufferedReader br=new BufferedReader(new FileReader(file));
