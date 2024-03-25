@@ -142,20 +142,39 @@ public class Booking_parser {
                         hotels.put(temp_data.get(0),temp_data);
                     }
             }
-            inverted_index_data(cityname);
-            convert_json();
-            }
 
+            }
+        inverted_index_data(cityname);
+        convert_json();
 
     }
-    public static void inverted_index_data(String cityname) throws FileNotFoundException {
+    public static void inverted_index_data(String cityname) throws IOException {
         ArrayList<String> names= new ArrayList<String>();
-        for(String s:hotels.keySet()){
-            names.add(s);
+        int counter=0;
+        File file= new File("inverted_index_data");
+        BufferedReader br= new BufferedReader(new FileReader(file));
+        String city;
+        ArrayList<String> lines= new ArrayList<String>();
+        while((city=br.readLine())!=null){
+            String name= city.substring(0,city.indexOf(':'));
+            if(name==cityname){
+                counter=1;
+            }
+            lines.add(city);
         }
-        PrintWriter pw= new PrintWriter("inverted_index_data");
-        pw.println(cityname.concat(": ").concat(String.join(", ", names)));
-        pw.close();
+        br.close();
+        if(counter==0){
+            for(String s:hotels.keySet()){
+                names.add(s);
+            }
+            lines.add((cityname.concat(": ").concat(String.join(", ", names))));
+            PrintWriter pw= new PrintWriter("inverted_index_data");
+            for(String s:lines){
+                pw.println(s);
+            }
+            pw.close();
+
+        }
 
     }
 
