@@ -46,14 +46,36 @@ public class SpellCheck {
                 edit_dist(city, find, m - 1, n - 1));//replace
     }
     public static String edit_distance(String find){
+        HashMap<Integer,ArrayList<String>> map= new HashMap<Integer,ArrayList<String>>();
         for(String s:cities){
             int temp=edit_dist(s,find,s.length(),find.length());
             System.out.println(String.valueOf(temp)+" "+s+" "+find);
-            dist.add(temp);
+            if(map.containsKey(temp)){
+                map.get(temp).add(s);
+            }
+            else{
+                ArrayList<String> tempo= new ArrayList<String>();
+                tempo.add(s);
+                map.put(temp,tempo);
+            }
+            //dist.add(temp);
         }
-        System.out.println(cities.get(dist.indexOf(Collections.min(dist))));
 
-        return cities.get(dist.indexOf(Collections.min(dist)));
+        int min=100000;
+        for(int i:map.keySet()){
+            if(min>i){
+                min=i;
+            }
+        }
+        System.out.println(map.get(min).get(0));
+        return map.get(min).get(0);
+
+
+
+//        System.out.println(dist.indexOf(Collections.min(dist)));
+//        System.out.println(cities.get(dist.indexOf(Collections.min(dist))));
+
+//        return cities.get(dist.indexOf(Collections.min(dist)));
     }
     public static void main(String[] args){
         cities.add("TORONTO");
