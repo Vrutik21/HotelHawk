@@ -4,13 +4,20 @@ import { Controller, useForm } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
-import { Autocomplete, CircularProgress, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { ArrowBackOutlined, ArrowForwardOutlined } from "@mui/icons-material";
 import Select from "react-select";
 import dayjs from "dayjs";
+import { useRef } from "react";
 
 const Home = () => {
   const { register, handleSubmit, reset, control } = useForm();
@@ -26,24 +33,30 @@ const Home = () => {
     value: "oldsearch",
     label: "Old Crawling",
   });
+  const [hotelOptions, setHotelOptions] = useState([]);
+  const hint = useRef("");
 
-  const getHotelsData = async (city, checkin, checkout) => {
+  console.log(hotelOptions, "hotelOptions");
+
+  const getHotelsData = async (city, checkin, checkout, hotel) => {
     try {
       const url =
         selectedCrawling.value === "oldsearch"
           ? `http://localhost:8080/oldsearch/${city}`
           : `http://localhost:8080/newsearch/${city}/${checkin}/${checkout}`;
 
-      // console.log(crawling, "crawlingHotels");
+      const searchSelectUrl = `http://localhost:8080/select/${city}/${hotel}`;
+
       setLoader(true);
-      const response = await axios.get(url);
+      const response = await axios.get(
+        hotel?.length > 0 ? searchSelectUrl : url
+      );
       setHotelData(response.data);
       reset();
       setLoader(false);
       if (response.data === null) {
         setError("No Options");
       }
-      console.log(response, "response");
     } catch (error) {
       reset();
       setLoader(false);
@@ -53,14 +66,11 @@ const Home = () => {
     }
   };
 
-  console.log(hotelData, "hotelData");
-
   const getTrendingCities = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/pg/`);
 
       setTrendingCities(response?.data ? response.data : {});
-      console.log(response.data, "trending");
     } catch (err) {
       console.log(err);
     }
@@ -74,14 +84,34 @@ const Home = () => {
           `http://localhost:8080/find/${searchData}`
         );
         setPollingData(response.data);
+
         setError(null);
         setIsLoading(false);
         return response;
       } catch (error) {
         console.log("Error fetching search data: ", error);
+      } finally {
+        if (pollingData.length > 0) {
+          let tempFilteredHotels = [];
+
+          pollingData.forEach((item) => {
+            if (item?.Hotels?.length) {
+              item.Hotels.split(",").forEach((hotel) => {
+                tempFilteredHotels.push({
+                  label: hotel.trim(), // trim to remove any leading/trailing spaces
+                  value: `hotel/${item.Cityname}`,
+                });
+              });
+            }
+          });
+
+          console.log(tempFilteredHotels, "tempHotels");
+
+          setHotelOptions(tempFilteredHotels);
+        }
       }
     }
-
+    setHotelOptions([]);
     setPollingData([]);
   };
 
@@ -98,14 +128,13 @@ const Home = () => {
         checkin: dayjs(data.checkin).format("YYYY-MM-DD"),
         checkout: dayjs(data.checkout).format("YYYY-MM-DD"),
       },
-      "handleDAta"
+      "searchData"
     );
 
     const checkin = dayjs(data.checkin).format("YYYY-MM-DD");
     const checkout = dayjs(data.checkout).format("YYYY-MM-DD");
 
     getHotelsData(data.city, checkin, checkout);
-    console.log(hotelData, "response");
   };
 
   const handleWebsiteSelection = (option) => {
@@ -127,26 +156,36 @@ const Home = () => {
   const CustomPrevArrow = (props) => {
     const { className, style, onClick } = props;
     return (
-      <div
+      <ArrowBackOutlined
         className={className}
-        style={{ ...style, display: "block", left: -30, top: 180 }}
+        style={{
+          ...style,
+          display: "block",
+          left: -40,
+          top: 210,
+          color: "#0877A2",
+        }}
         onClick={onClick}
-      >
-        <ArrowBackOutlined fontSize="large" style={{ color: "#0877A2" }} />
-      </div>
+        fontSize="large"
+      />
     );
   };
 
   const CustomNextArrow = (props) => {
     const { className, style, onClick } = props;
     return (
-      <div
+      <ArrowForwardOutlined
         className={className}
-        style={{ ...style, display: "block", right: -10, top: 180 }}
+        style={{
+          ...style,
+          display: "block",
+          right: -40,
+          top: 210,
+          color: "0877A2",
+        }}
         onClick={onClick}
-      >
-        <ArrowForwardOutlined fontSize="large" style={{ color: "#0877A2" }} />
-      </div>
+        fontSize="large"
+      />
     );
   };
 
@@ -159,6 +198,12 @@ const Home = () => {
     prevArrow: <CustomPrevArrow />,
     nextArrow: <CustomNextArrow />,
   };
+
+  const isLowerCase = (str) =>
+    str.slice(str.length - 1, str.length) ===
+    str.slice(str.length - 1, str.length).toLowerCase();
+
+  console.log(hotelData, "hotelData");
 
   return (
     <div className="container-xxl bg-white p-0">
@@ -210,6 +255,12 @@ const Home = () => {
                     <a href="#hello-hotels">
                       <img
                         src={trendingCities[key].split(" ")[1]}
+                        style={{
+                          height: "430px",
+                          width: "400px",
+                          border: "1px solid transparent",
+                          borderRadius: "10px",
+                        }}
                         alt={"Hotel " + (i + 1)}
                         className="img-fluid"
                       />
@@ -235,87 +286,123 @@ const Home = () => {
                 <div className="row g-2">
                   <div className="col-lg-4 col-md-4">
                     <Autocomplete
-                      // value={searchData}
-                      options={pollingData}
-                      loading={isLoading}
-                      getOptionLabel={(option) => option.Cityname}
-                      onInputChange={(event, newInputValue) => {
-                        console.log(newInputValue, "newInputValue");
-                        setSearchData(newInputValue);
+                      onKeyDown={(event) => {
+                        if (event.key === "Tab") {
+                          if (hint.current) {
+                            setSearchData(hint.current);
+                            event.preventDefault();
+                          }
+                        }
                       }}
+                      onBlur={() => {
+                        hint.current = "";
+                      }}
+                      disablePortal
                       forcePopupIcon={false}
-                      // disableClearable
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          {...register("city")}
-                          hiddenLabel={true}
-                          variant="outlined"
-                          color="primary"
-                          error={error !== null}
-                          helperText={error}
-                          placeholder="Search"
-                          InputProps={{
-                            ...params.InputProps,
-                            style: {
-                              backgroundColor: "white",
-                              borderColor: "transparent",
-                            },
-                            endAdornment: (
-                              <>
-                                {isLoading && (
-                                  <CircularProgress color="inherit" size={20} />
-                                )}
-                                {params.InputProps.endAdornment}
-                              </>
-                            ),
-                          }}
-                        />
-                      )}
-                      renderOption={(props, option) => (
-                        <>
-                          <li
-                            {...props}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
+                      inputValue={searchData}
+                      onChange={(e, v) => {
+                        console.log(v, "v");
+                        setSearchData(v?.label ?? "");
+                        hint.current = "";
+                        getHotelsData(
+                          v?.value.split("/")[1],
+                          null,
+                          null,
+                          v?.label
+                        );
+                      }}
+                      getOptionLabel={(option) => option?.label}
+                      filterOptions={(options, state) => {
+                        const displayOptions = options.filter((option) =>
+                          option.value
+                            .toLowerCase()
+                            .trim()
+                            .includes(state.inputValue.toLowerCase().trim())
+                        );
+                        return displayOptions;
+                      }}
+                      id="combo-box-hint-demo"
+                      options={hotelOptions}
+                      sx={{ width: 300 }}
+                      renderInput={(params) => {
+                        return (
+                          <Box
+                            sx={{
+                              position: "relative",
+                              background: "white",
                             }}
                           >
-                            <span>{option.Cityname}</span>
-                            {option.Search_Freq && (
-                              <span>
-                                {option.Search_Freq}
-                                <TrendingUpIcon
-                                  style={{ color: "#0877A2" }}
-                                  fontSize="small"
-                                />
-                              </span>
-                            )}
-                          </li>
-                          {option.Hotels.split(",").map((item) => (
-                            <li
-                              {...props}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
+                            <Typography
+                              sx={{
+                                position: "absolute",
+                                opacity: 0.5,
+                                left: 14,
+                                top: 16,
+                                color: "CaptionText",
                               }}
                             >
-                              <span>{item}</span>
-                              {/* {option.Search_Freq && (
-                              <span>
-                                {option.Search_Freq}
-                                <TrendingUpIcon
-                                  style={{ color: "#0877A2" }}
-                                  fontSize="small"
-                                />
-                              </span>
-                            )} */}
-                            </li>
-                          ))}
-                        </>
-                      )}
+                              {hint.current}
+                            </Typography>
+                            <TextField
+                              {...params}
+                              {...register("city")}
+                              placeholder="Search City"
+                              onChange={(e) => {
+                                const newValue = e.target.value;
+                                setSearchData(newValue);
+                                const matchingOption = pollingData.find(
+                                  (option) => {
+                                    if (newValue.toLowerCase() === newValue) {
+                                      return option.Cityname.toLowerCase().startsWith(
+                                        newValue.toLowerCase()
+                                      );
+                                    } else {
+                                      return option.Cityname.toUpperCase().startsWith(
+                                        newValue.toUpperCase()
+                                      );
+                                    }
+                                  }
+                                );
+
+                                if (newValue && matchingOption) {
+                                  hint.current =
+                                    newValue.toLowerCase() === newValue
+                                      ? matchingOption.Cityname.toLowerCase()
+                                      : matchingOption.Cityname.toUpperCase();
+                                } else {
+                                  hint.current = "";
+                                }
+                              }}
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <>
+                                    {isLoading && (
+                                      <CircularProgress
+                                        color="inherit"
+                                        size={20}
+                                      />
+                                    )}
+                                    {params.InputProps.endAdornment}
+                                    {searchData !== "" &&
+                                      pollingData.length > 0 && (
+                                        <>
+                                          <TrendingUpIcon
+                                            style={{ color: "#0877A2" }}
+                                            fontSize="small"
+                                          />
+                                          <span>
+                                            {pollingData[0].Search_Freq}
+                                          </span>
+                                        </>
+                                      )}
+                                  </>
+                                ),
+                              }}
+                            />
+                          </Box>
+                        );
+                      }}
                     />
                   </div>
                   <div class="col-lg-3 col-md-4">
@@ -376,7 +463,6 @@ const Home = () => {
                       ]}
                       onChange={(value) => {
                         setSelectedCrawling(value);
-                        console.log(value, "onchangeValue");
                       }}
                       isSearchable={false}
                       styles={{
@@ -399,7 +485,10 @@ const Home = () => {
                 </div>
               </div>
               <div className="col-lg-1 col-md-2">
-                <button className="button btn btn-dark border-0 w-100 py-3">
+                <button
+                  className="button btn btn-dark border-0 w-100 py-3"
+                  style={{ marginLeft: "40px" }}
+                >
                   Search
                 </button>
               </div>
@@ -481,64 +570,91 @@ const Home = () => {
                     />
                   </div>
                 ) : hotelData ? (
-                  hotelData[selectedOption].map((item) => (
-                    <div
-                      className="col-lg-4 col-md-6 wow fadeInUp"
-                      data-wow-delay="0.1s"
-                    >
-                      <div className="property-item">
-                        <div className="">
-                          <Slider {...hotelListingsettings}>
-                            <div>
+                  (hotelData[selectedOption] ?? [...hotelData].reverse()).map(
+                    (item) => (
+                      <div
+                        className="col-lg-4 col-md-6 wow fadeInUp"
+                        data-wow-delay="0.1s"
+                      >
+                        <div className="property-item">
+                          <div className="">
+                            <Slider {...hotelListingsettings}>
+                              {item?.["Images "]
+                                ?.trim()
+                                .split(" ")
+                                .map((photo) => (
+                                  <div>
+                                    <img
+                                      className="img-fluid"
+                                      style={{
+                                        width: "450px",
+                                        height: "300px",
+                                      }}
+                                      src={photo}
+                                      alt=""
+                                    />
+                                  </div>
+                                ))}
+                              {/* <div>
+                                <img
+                                  className="img-fluid"
+                                  style={{ width: "450px", height: "300px" }}
+                                  src={item?.["Images "]?.split(" ")[1]}
+                                  alt=""
+                                />
+                              </div>
+                              <div>
+                                <img
+                                  className="img-fluid"
+                                  style={{ width: "450px", height: "300px" }}
+                                  src={item?.["Images "]?.split(" ")[2]}
+                                  alt=""
+                                />
+                              </div> */}
+                            </Slider>
+                          </div>
+                          <div className="p-4 pb-0">
+                            {item?.["Distance "]?.length > 0 && (
+                              <h6 className="text-primary mb-3">
+                                {Number(item?.["Distance "]).toFixed(2)} Km away
+                              </h6>
+                            )}
+                            <h5 className="text-primary mb-3">
+                              {item?.["MinPrice "] === "Not Available "
+                                ? "Price not available"
+                                : item?.["MinPrice "].split(" ")[0] === "CAD"
+                                ? `$ ${Math.min(
+                                    item?.["MinPrice "].split(" ")[1]
+                                  )}`
+                                : `$ ${Math.min(
+                                    item?.["MinPrice "].split(" ")[0]
+                                  )}`}
+                            </h5>
+                            <a className="d-block h5 mb-2" href="">
+                              {item?.["Name "]}
+                            </a>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "10px",
+                                paddingBottom: "10px",
+                              }}
+                            >
+                              {/* <i className="fa fa-map-marker-alt text-primary me-2" /> */}
                               <img
-                                className="img-fluid"
-                                style={{ width: "450px", height: "300px" }}
-                                src={item?.["Images "]?.split(" ")[0]}
-                                alt=""
+                                width={"15px"}
+                                src="rating.svg"
+                                alt="ratings"
                               />
+                              <span>{item?.["Review "].split(" ")[0]}</span>
                             </div>
-                            <div>
-                              <img
-                                className="img-fluid"
-                                style={{ width: "450px", height: "300px" }}
-                                src={item?.["Images "]?.split(" ")[1]}
-                                alt=""
-                              />
-                            </div>
-                            <div>
-                              <img
-                                className="img-fluid"
-                                style={{ width: "450px", height: "300px" }}
-                                src={item?.["Images "]?.split(" ")[2]}
-                                alt=""
-                              />
-                            </div>
-                          </Slider>
+                            {/* <p></p> */}
+                          </div>
+                          {/* <div className="d-flex border-top"></div> */}
                         </div>
-                        <div className="p-4 pb-0">
-                          <h5 className="text-primary mb-3">
-                            {item?.["MinPrice "] === "Not Available "
-                              ? "Price not available"
-                              : item?.["MinPrice "].split(" ")[0] === "CAD"
-                              ? `$ ${Math.min(
-                                  item?.["MinPrice "].split(" ")[1]
-                                )}`
-                              : `$ ${Math.min(
-                                  item?.["MinPrice "].split(" ")[0]
-                                )}`}
-                          </h5>
-                          <a className="d-block h5 mb-2" href="">
-                            {item?.["Name "]}
-                          </a>
-                          <p>
-                            <i className="fa fa-map-marker-alt text-primary me-2" />
-                            {item?.["Review "].split(" ")[0]}
-                          </p>
-                        </div>
-                        <div className="d-flex border-top"></div>
                       </div>
-                    </div>
-                  ))
+                    )
+                  )
                 ) : (
                   <div
                     style={{
