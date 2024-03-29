@@ -29,10 +29,7 @@ public class FreqCount {
         states.put("winnipeg","Ontario");
         states.put("edmonton","Ontario");
         states.put("hamilton","Ontario");
-
-
     }
-
     private static int countOccurrences(String text, String searchString) {
         int count = 0;
         int index = 0;
@@ -42,41 +39,15 @@ public class FreqCount {
         }
         return count;
     }
-    public static void fc_booking(ArrayList<String> cities) throws IOException {
-        for(String cityname:cities){
-            String url="https://www.booking.com//";
-            String t=url+"/"+cityname+"-"+"Canada";
-            Connection con= Jsoup.connect(t);
-            Document doc=con.get();
-            String text= doc.text();
-            int cnt = countOccurrences(text, cityname);
-            if(count.containsKey(cityname)){
-                count.put(cityname,count.get(cityname)+cnt);
-            }
-            else{
-                count.put(cityname,cnt);
-            }
-        }
-
+    public static String fc_booking(String cityname, String searchString) throws IOException {
+        String text= searchString;
+        int cnt = countOccurrences(text, cityname);
+        return Integer.toString(cnt);
     }
-
-    public static void fc_hotels(ArrayList<String> cities){
-        WebDriver driver=new ChromeDriver();
-        for(String cityname:cities){
-            String url= "https://ca.hotels.com/Hotel-Search?adults=2&d1=2024-04-21&d2=2024-04-22&destination=".concat(cityname.toLowerCase()).concat("%2C%20".concat(states.get(cityname.toLowerCase())).concat("%2C%20Canada"));
-            driver.get(url);
-            driver.manage().window();
-            Document doc= Jsoup.parse(driver.toString());
-            String text= doc.text();
-            int cnt = countOccurrences(text, cityname);
-            if(count.containsKey(cityname)){
-                count.put(cityname,count.get(cityname)+cnt);
-            }
-            else{
-                count.put(cityname,cnt);
-            }
-        }
-        driver.close();
+    public static String fc_hotels(String cityname, String searchString){
+        String text= searchString;
+        int cnt = countOccurrences(text, cityname);
+        return Integer.toString(cnt);
 
     }
     public static void fc_mmt(){
@@ -102,32 +73,6 @@ public class FreqCount {
         pw.close();
     }
     public static void main(String[] args) throws IOException {
-        ArrayList<String> cities=new ArrayList<String>();
-        cities.add("Toronto");
-        states.put("toronto","Ontario");
-        cities.add("Calgary");
-        states.put("calgary","Alberta");
-        cities.add("Vancouver");
-        states.put("vancouver","British%20Columbia");
-        cities.add("Montreal");
-        states.put("montreal","Quebec");
-        cities.add("OTTAWA");
-        states.put("ottawa","Ontario");
-        cities.add("WINDSOR");
-        states.put("windsor","Ontario");
-        cities.add("HALIFAX");
-        states.put("halifax","Ontario");
-        cities.add("WINNIPEG");
-        states.put("winnipeg","Ontario");
-        cities.add("EDMONTON");
-        states.put("edmonton","Ontario");
-        cities.add("HAMILTON");
-        states.put("hamilton","Ontario");
-
-        fc_booking(cities);
-        fc_hotels(cities);
-        print();
-        save();
 
     }
 }

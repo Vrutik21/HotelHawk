@@ -6,6 +6,8 @@ import com.HotelHawk.Spring.SearchFrequency.SearchFreq;
 import com.HotelHawk.Spring.spellcheck.SpellCheck;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,10 +26,11 @@ public class DataValidationController {
         String[] result= DataValidation.check(checkin_date,checkout_date,cityname);
         if(result.length==2){
             //go to call crawler,
-            if(crawl_type.equalsIgnoreCase("oldsearch")){
+            if((crawl_type.toLowerCase()).matches("oldsearch")){
                 SearchFreq.update(cityname);
                 String[] d= {cityname};
                 String fcityname= SpellCheck.main(d);
+                System.out.println(fcityname);
                 String path = System.getProperty("user.dir").concat("\\").concat(fcityname.toLowerCase());
                 //System.out.println(path);
                 File file=new File(path+"_finaldata");
@@ -64,8 +67,7 @@ public class DataValidationController {
         else{
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("MyResponseHeader", "");
-            return new HttpEntity<>("Please give correct input for cityname or dates", responseHeaders);
+            return new ResponseEntity<>("Citynames should be of big cities only, checkin and checkout date should have good format and checkkout date should be greater than checkin date", HttpStatus.BAD_REQUEST);
         }
-
     }
 }

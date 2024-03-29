@@ -12,7 +12,6 @@ public class DataValidation {
             "yyyy-MM-dd", "dd-MM-yyyy", "MM-dd-yyyy", "yyyy/MM/dd", "dd/MM/yyyy", "MM/dd/yyyy",
             "yyyy.MM.dd", "dd.MM.yyyy", "MM.dd.yyyy", "yyyyMMdd", "ddMMyyyy", "MMddyyyy"};
 
-    private static final String[] VALID_CITIES = {"Toronto", "Hamilton", "Vancouver", "Calgary","Windsor", "Winnipeg"};
     private static final String URL_REGEX = "^(https?|ftp)://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(/\\S*)?$";
 
     public static boolean isValidURL(String url) {
@@ -36,17 +35,9 @@ public class DataValidation {
     }
 
     public static boolean isValidCity(String city) {
-        return city.matches("[a-zA-Z]+") && containsIgnoreCase(city, VALID_CITIES);
+        return city.matches("[a-zA-Z]+");
     }
 
-    public static boolean containsIgnoreCase(String str, String[] array) {
-        for (String s : array) {
-            if (s.equalsIgnoreCase(str)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public static boolean isCheckoutDateAfterCheckinDate(String checkinDate, String checkoutDate) {
         if (!isValidDateFormat(checkinDate) || !isValidDateFormat(checkoutDate)) {
