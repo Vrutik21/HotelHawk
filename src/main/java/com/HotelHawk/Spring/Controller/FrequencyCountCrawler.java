@@ -11,7 +11,7 @@ import java.io.*;
 @RestController
 public class FrequencyCountCrawler {
     @CrossOrigin
-    @RequestMapping("/fc/")
+    @RequestMapping("/fc/{cityname}")
     public static HttpEntity<String> freqcount() throws IOException {
         File file=new File(System.getProperty("user.dir")+"\\freqcount");
         BufferedReader br=new BufferedReader(new FileReader(file));

@@ -18,6 +18,21 @@ import java.util.HashMap;
 public class FreqCount {
     public static HashMap<String,Integer> count= new HashMap<String, Integer>();
     public static HashMap<String,String> states= new HashMap<String,String>();
+    public static void initialize(String cityname,String searchString){
+        states.put("toronto","Ontario");
+        states.put("calgary","Alberta");
+        states.put("vancouver","British%20Columbia");
+        states.put("montreal","Quebec");
+        states.put("ottawa","Ontario");
+        states.put("windsor","Ontario");
+        states.put("halifax","Ontario");
+        states.put("winnipeg","Ontario");
+        states.put("edmonton","Ontario");
+        states.put("hamilton","Ontario");
+
+
+    }
+
     private static int countOccurrences(String text, String searchString) {
         int count = 0;
         int index = 0;

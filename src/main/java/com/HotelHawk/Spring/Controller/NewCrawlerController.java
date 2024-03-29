@@ -26,7 +26,8 @@ public class NewCrawlerController {
     @RequestMapping("/newsearch/{cityname}/{checkin_date}/{checkout_date}")
     public HttpEntity<String> crawl_all(@PathVariable String cityname, @PathVariable String checkin_date, @PathVariable String checkout_date) throws IOException, InterruptedException {
         SearchFreq.update(cityname);
-        String fcityname= SpellCheck.initialize(cityname);
+        String[] d= {cityname};
+        String fcityname= SpellCheck.main(d);
         System.out.println(checkin_date);
 
 

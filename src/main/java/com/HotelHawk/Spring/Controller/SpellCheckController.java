@@ -13,7 +13,8 @@ public class SpellCheckController {
     @CrossOrigin
     @RequestMapping("/spellcheck/{cityname}")
     public static HttpEntity<String> spell_check(@PathVariable String cityname){
-        String fcityname= SpellCheck.initialize(cityname);
+        String[] d={cityname};
+        String fcityname= SpellCheck.main(d);
         String t="";
         if(cityname.matches(fcityname)){
             t="";

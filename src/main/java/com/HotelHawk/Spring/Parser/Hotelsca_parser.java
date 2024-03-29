@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,16 +80,29 @@ public class Hotelsca_parser {
                         }
                         temp_data.add(im);
                         //getting reviews
-                        WebElement rev = driver.findElement(By.xpath("//meta[@itemprop='ratingValue']"));
-                        System.out.println(rev.getAttribute("content"));
-                        temp_data.add(rev.getAttribute("content"));
+                        try{
+                            WebElement rev = driver.findElement(By.xpath("//meta[@itemprop='ratingValue']"));
+                            System.out.println(rev.getAttribute("content"));
+                            temp_data.add(rev.getAttribute("content"));
+                        }
+                        catch (NoSuchElementException e){
+                            temp_data.add("No reviews");
+                            System.out.println(e);
+                        }
 
                         //getting hotel location
-                        WebElement street_loc = driver.findElement(By.xpath("//meta[@itemprop='streetAddress']"));
-                        WebElement city_loc = driver.findElement(By.xpath("//meta[@itemprop='name']"));
-                        WebElement province_loc = driver.findElement(By.xpath("//meta[@itemprop='addressRegion']"));
-                        System.out.println(street_loc.getAttribute("content").concat(",").concat(city_loc.getAttribute("content")).concat(",").concat(province_loc.getAttribute("content")));
-                        temp_data.add((street_loc.getAttribute("content").concat(",").concat(city_loc.getAttribute("content")).concat(",").concat(province_loc.getAttribute("content"))));
+
+                        try{
+                            WebElement street_loc = driver.findElement(By.xpath("//meta[@itemprop='streetAddress']"));
+                            WebElement city_loc = driver.findElement(By.xpath("//meta[@itemprop='name']"));
+                            WebElement province_loc = driver.findElement(By.xpath("//meta[@itemprop='addressRegion']"));
+                            System.out.println(street_loc.getAttribute("content").concat(",").concat(city_loc.getAttribute("content")).concat(",").concat(province_loc.getAttribute("content")));
+                            temp_data.add((street_loc.getAttribute("content").concat(",").concat(city_loc.getAttribute("content")).concat(",").concat(province_loc.getAttribute("content"))));
+
+                        }
+                        catch (NoSuchElementException e){
+                            temp_data.add("Location not Specified");
+                        }
 
                         //getting hotel description
                         //                WebElement desc= driver.findElement(By.xpath("//*[@id=\"app-layer-base\"]/div/main/div/div/section/div[1]/div[1]/div[2]/div/div[3]/div[13]/div/div/section/div/div/div/div[2]/div/div/div[3]/div/div/div/div/div/div/div"));

@@ -23,6 +23,8 @@ public class Hotelsca_crawler {
         states.put("vancouver","British%20Columbia");
         states.put("montreal","Quebec");
         states.put("windsor","Ontario");
+        states.put("winnipeg","Manitoba");
+        states.put("halifax","Nova%20Scotia");
         System.out.println(checkin_date);
         String url= ((((("https://ca.hotels.com/Hotel-Search?adults=2&d1=".concat(checkin_date)).concat("&d2=")).concat(checkout_date)).concat("&destination=")).concat(cityname)).concat("%2C%20".concat(states.get(cityname.toLowerCase())).concat("%2C%20Canada"));
         //String url=url_city.concat("%2C%20".concat(states.get(cityname)).concat("%2C%20Canada"));

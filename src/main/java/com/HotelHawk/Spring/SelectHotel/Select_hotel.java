@@ -18,7 +18,7 @@ public class Select_hotel {
         BufferedReader br= new BufferedReader(new FileReader(file));
         String line= br.readLine();
         String cl= line.substring(line.indexOf('['),line.length());
-        String cf= cl.substring(0,cl.indexOf(']')+1);
+        String cf= cl.substring(0,cl.indexOf("mmt")-2);
         //System.out.println(cf);
         JSONArray json_array= new JSONArray(cf);
         HashMap<Double, ArrayList<JSONObject>> map= new HashMap<Double,ArrayList<JSONObject>>();
@@ -26,7 +26,7 @@ public class Select_hotel {
         String data="";
         int locs=0;
         for(int i=0;i< json_array.length();i++){
-            //System.out.println((json_array.getJSONObject(i).getString("Name ")));
+            System.out.println((json_array.getJSONObject(i).getString("Name ")));
             if ((json_array.getJSONObject(i).getString("Name ")).matches(hotelname)){
                 data=json_array.getJSONObject(i).toString();
                 locs=i;

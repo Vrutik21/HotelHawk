@@ -1,5 +1,6 @@
 package com.HotelHawk.Spring.Crawler;
 
+
 import java.io.FileNotFoundException;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -49,6 +50,11 @@ public class MakeMyTrip_crawler {
             String html = driver.getPageSource();
 
             // Parse the HTML using Jsoup
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             Document document = Jsoup.parse(html);
             //  System.out.println("document:" + document);
             Hashtable<String,String[]> hb = MakeMyTrip_parser.Make_My_Trip_Parser(document, city);
