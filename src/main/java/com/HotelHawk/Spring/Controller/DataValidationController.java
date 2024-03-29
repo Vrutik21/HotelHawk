@@ -19,32 +19,47 @@ import java.io.IOException;
 @RestController
 public class DataValidationController {
     @CrossOrigin
-    @RequestMapping("/datavalidate/{cityname}/{checkin_date}/{checkout_date}")
-    public HttpEntity<String> datavalidation(@PathVariable String cityname,@PathVariable String checkin_date, @PathVariable String checkout_date) throws IOException, InterruptedException {
+    @RequestMapping("/datavalidate/{crawl_type}/{cityname}/{checkin_date}/{checkout_date}")
+    public HttpEntity<String> datavalidation(@PathVariable String cityname,@PathVariable String checkin_date, @PathVariable String checkout_date, @PathVariable String crawl_type) throws IOException, InterruptedException {
         String[] result= DataValidation.check(checkin_date,checkout_date,cityname);
         if(result.length==2){
             //go to call crawler,
-            SearchFreq.update(cityname);
-            String[] d={cityname};
-            String fcityname= SpellCheck.main(d);
-            System.out.println(checkin_date);
-            NewCrawlerController c= new NewCrawlerController();
-            c.booking_crawl(fcityname,checkin_date,checkout_date);
-            c.hotel_crawl(fcityname,checkin_date,checkout_date);
-            c.mmt_crawl(fcityname,checkin_date,checkout_date);
+            if(crawl_type.equalsIgnoreCase("oldsearch")){
+                SearchFreq.update(cityname);
+                String[] d= {cityname};
+                String fcityname= SpellCheck.main(d);
+                String path = System.getProperty("user.dir").concat("\\").concat(fcityname.toLowerCase());
+                //System.out.println(path);
+                File file=new File(path+"_finaldata");
+                BufferedReader br=new BufferedReader(new FileReader(file));
+                String temp=br.readLine();
+                HttpHeaders responseHeaders = new HttpHeaders();
+                responseHeaders.set("MyResponseHeader", br.readLine());
+                return new HttpEntity<>(temp, responseHeaders);
+            }
+            else {
+                SearchFreq.update(cityname);
+                String[] d = {cityname};
+                String fcityname = SpellCheck.main(d);
+                System.out.println(checkin_date);
+                NewCrawlerController c = new NewCrawlerController();
+                c.booking_crawl(fcityname, checkin_date, checkout_date);
+                c.hotel_crawl(fcityname, checkin_date, checkout_date);
+                c.mmt_crawl(fcityname, checkin_date, checkout_date);
 
-            ///mergering data from crawlers into one json file.
-            MergeData.merge(cityname);
+                ///mergering data from crawlers into one json file.
+                MergeData.merge(cityname);
 
 
-            String path = System.getProperty("user.dir");
-            //System.out.println(path);
-            File file=new File(path+"\\finaldata");
-            BufferedReader br=new BufferedReader(new FileReader(file));
-            String temp=br.readLine();
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("MyResponseHeader", br.readLine());
-            return new HttpEntity<>(temp, responseHeaders);
+                String path = System.getProperty("user.dir");
+                //System.out.println(path);
+                File file = new File(path + "\\finaldata");
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String temp = br.readLine();
+                HttpHeaders responseHeaders = new HttpHeaders();
+                responseHeaders.set("MyResponseHeader", br.readLine());
+                return new HttpEntity<>(temp, responseHeaders);
+            }
         }
         else{
             HttpHeaders responseHeaders = new HttpHeaders();
