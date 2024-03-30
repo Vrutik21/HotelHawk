@@ -1,9 +1,10 @@
 package com.HotelHawk.Spring.Crawler;
 
-import java.io.FileNotFoundException;
-import java.util.Enumeration;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
+import com.HotelHawk.Spring.FrequencyCount.FreqCount;
 import com.HotelHawk.Spring.Parser.MakeMyTrip_parser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,7 +15,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class MakeMyTrip_crawler {
 
-    public static Hashtable<String, Hashtable> extractCities(String[] cities,String checkin,String checkout) throws FileNotFoundException {
+    public static Hashtable<String, Hashtable> extractCities(String[] cities,String checkin,String checkout) throws IOException {
 
 
         Hashtable<String,Hashtable> hs = new Hashtable<>();
@@ -57,12 +58,33 @@ public class MakeMyTrip_crawler {
             }
             // Parse the HTML using Jsoup
             Document document = Jsoup.parse(html);
+            int count_cf= FreqCount.fc_mmt(city,document.text());
             //  System.out.println("document:" + document);
             Hashtable<String,String[]> hb = MakeMyTrip_parser.Make_My_Trip_Parser(document, city);
 
             hs.put(city, hb);
+            fc_data(city,count_cf);
         }
+
         return hs;
+    }
+    public static void fc_data(String cityname, int count) throws IOException {
+        System.out.println("Hola ".concat(Integer.toString(count)));
+        System.out.println(cityname);
+        String path= System.getProperty("user.dir");
+        File f = new File(path.concat("\\").concat(cityname.toLowerCase()).concat("_fc"));
+        BufferedReader br= new BufferedReader(new FileReader(f));
+        String st;
+        ArrayList<String> lines= new ArrayList<String>();
+        while((st=br.readLine())!=null){
+            lines.add(st);
+        }
+        lines.add("mmt:".concat(Integer.toString(count)));
+        PrintWriter pw= new PrintWriter(f);
+        for(String s: lines){
+            pw.println(s);
+        }
+        pw.close();
     }
 
     public static String getcitycode(String city)
@@ -82,7 +104,7 @@ public class MakeMyTrip_crawler {
         return citycodes.get(city.toUpperCase());
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
 
         String city = "ottawa";
         String[] cities ={city};

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONArray;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -13,9 +15,24 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Filter {
+    // Regex pattern for numerical input
+    public static String numericRegex = "^-?\\d+$";
+
+    public static boolean isValidPrice(String price, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(price);
+        return matcher.matches();
+    }
+
     public static String filter_data(String city_name, int minPrice, int maxPrice,int minReview) throws IOException {
+//        if (!isValidPrice(Integer.toString(minPrice), numericRegex) || (minPrice)<0 || (!isValidPrice(Integer.toString(maxPrice), numericRegex)) || ((maxPrice)<(minPrice))){
+//            System.out.println("Invalid minimum price. Please input numerical value.");
+//            return "BAD GATEWAY";
+//        }
         String[] d={city_name};
         String cityname= SpellCheck.main(d);
         File file= new File((cityname.toLowerCase()).concat("_finaldata"));
@@ -80,6 +97,6 @@ public class Filter {
 
 
     public static void main(String[] args) throws IOException {
-        filter_data("calgary",300,400,6);
+        filter_data("calgary",600,400,6);
     }
 }
