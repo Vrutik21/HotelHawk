@@ -1,15 +1,16 @@
 package com.HotelHawk.Spring.Crawler;
 
+import com.HotelHawk.Spring.FrequencyCount.FreqCount;
 import com.HotelHawk.Spring.Parser.Hotelsca_parser;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,10 @@ public class Hotelsca_crawler {
         System.out.println(url);
         WebDriver driver=new ChromeDriver();
         driver.get(url);
+
+        Document d= Jsoup.parse(driver.toString());
+        int count_fc= FreqCount.fc_hotels(cityname,d.text());
+
         driver.manage().window().maximize();
         JavascriptExecutor js= (JavascriptExecutor) driver;
         js.executeScript("window.scrollBy(0,5000)","");
@@ -48,8 +53,31 @@ public class Hotelsca_crawler {
         driver.quit();
 
 //        System.out.println(linkss.size());
+        fc_data(cityname,count_fc);
         save_links();
+
     }
+
+    public static void fc_data(String cityname, int count) throws IOException {
+        System.out.println("Hola ".concat(Integer.toString(count)));
+        System.out.println(cityname);
+        String path= System.getProperty("user.dir");
+        File f = new File(path.concat("\\").concat(cityname.toLowerCase()).concat("_fc"));
+        BufferedReader br= new BufferedReader(new FileReader(f));
+        String st;
+        ArrayList<String> lines= new ArrayList<String>();
+        while((st=br.readLine())!=null){
+            lines.add(st);
+        }
+        lines.add("hotelsca:".concat(Integer.toString(count)));
+        PrintWriter pw= new PrintWriter(f);
+        for(String s: lines){
+            pw.println(s);
+        }
+        pw.close();
+    }
+
+
     public static void save_links() throws FileNotFoundException {
         //System.out.println("https://www.booking.com/hotel/ca/days-inn-toronto-downtown.en-gb.html?label=gen173nr-1FCBcoggI46AdIM1gEaCeIAQGYAQm4ARfIAQzYAQHoAQH4AQmIAgGoAgO4Apntzq8GwAIB0gIkZWMxZTk2NDItNmMxMi00YTFiLTliOTYtMDAwNGYxZmFlOTAz2AIG4AIB&aid=304142&ucfs=1&arphpl=1&dest_id=-574890&dest_type=city&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=5182138d13ba0087&srepoch=1710470811&from_sustainable_property_sr=1&from=searchresults".length());
         PrintWriter pr = new PrintWriter("hotelsca_links");

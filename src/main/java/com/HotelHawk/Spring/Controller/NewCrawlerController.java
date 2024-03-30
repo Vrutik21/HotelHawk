@@ -61,7 +61,7 @@ public class NewCrawlerController {
     @RequestMapping("/hotel_crawler")
     public void hotel_crawl(String cityname,String checkin_date, String checkout_date) throws IOException, InterruptedException {
         Hotelsca_crawler.cities(cityname, checkin_date,checkout_date);
-        Hotelsca_parser.extract_links(checkin_date,checkout_date);
+        Hotelsca_parser.extract_links(checkin_date,checkout_date,cityname);
     }
 
 

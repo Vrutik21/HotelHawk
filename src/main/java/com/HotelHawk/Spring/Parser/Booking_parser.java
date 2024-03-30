@@ -1,6 +1,7 @@
 
 package com.HotelHawk.Spring.Parser;
 
+import com.HotelHawk.Spring.FrequencyCount.FreqCount;
 import netscape.javascript.JSObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -45,6 +46,8 @@ public class Booking_parser {
                 String final_link= link.substring(0,ind+4).concat(checkin_out.concat(link.substring(ind+4,link.length())));
                 Connection c= Jsoup.connect(final_link);
                 Document d=c.get();
+
+
                 ArrayList<String> prices=new ArrayList<String>();
                 ////checking if website has status code of 200 or not
                 if (c.response().statusCode()==200)
@@ -125,29 +128,34 @@ public class Booking_parser {
                         for(Element l: faci){
                             Elements list= l.getElementsByClass("a5a5a75131");
                             for(Element el:list){
+                                //System.out.println(el.text());
                                 String input= (el.text());
                                 String[] lines = input.split("\n");
-                                Set<String> uniqueLinesSet = new HashSet<>();
+                                ArrayList<String> uniqueLinesSet = new ArrayList<String>();
 
                                 for (String line : lines) {
-                                    uniqueLinesSet.add(line);
+                                    if(!uniqueLinesSet.contains(line)){
+                                        uniqueLinesSet.add(line);
+                                        facilities+=line.concat(",");
+                                    }
+
                                 }
-                                facilities= String.join(", ", uniqueLinesSet);
+                                //System.out.println(facilities.substring(0,facilities.length()-1));
                             }
                         }
-                        temp_data.add(facilities);
-
-
-
+                        System.out.println(facilities);
+                        temp_data.add(facilities.substring(0,facilities.length()/2));
                         hotels.put(temp_data.get(0),temp_data);
                     }
             }
-
             }
         inverted_index_data(cityname);
         convert_json();
 
     }
+
+
+
     public static void inverted_index_data(String cityname) throws IOException {
         ArrayList<String> names= new ArrayList<String>();
         int counter=0;
@@ -163,7 +171,7 @@ public class Booking_parser {
             lines.add(city);
         }
         br.close();
-        if(counter==0){
+        if(counter==1){
             for(String s:hotels.keySet()){
                 names.add(s);
             }

@@ -61,11 +61,16 @@ public class MakeMyTrip_parser {
 			}
 
 			//saving the images of the hotels
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException ex) {
+				throw new RuntimeException(ex);
+			}
 
-			//System.out.println(l.getElementsByAttributeValue("alt","hotelImg"));
-
-			String str4 = l.getElementsByAttributeValue("alt","hotelImg").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_2").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_3").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_4").attr("src");
+			String str4 = l.getElementsByAttributeValue("alt","hotelImg").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_1").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_2").attr("src")+" "+l.getElementsByAttributeValue("alt","hotel_image_3").attr("src");
 //
+
+
 
 			//System.out.println(str4);
 			String str5 =  l.getElementsByAttributeValue("itemprop","ratingValue").text();
@@ -118,25 +123,25 @@ public class MakeMyTrip_parser {
 				String key1 = yy.nextElement();
 				String[] alldetails = jj.get(key1);
 				JSONObject json = new JSONObject();
-				System.out.println("Name"+key1);
-				System.out.println("MinPrice"+alldetails[1]);
-				System.out.println("Review"+alldetails[3]);
-				System.out.println("Images "+alldetails[2]);
-				System.out.println("location"+alldetails[4]);
-				System.out.println("Facilities"+alldetails[5]);
-				System.out.println("\n");
 				json.put("Name", key1);
-				json.put("MinPrice", alldetails[1]);
+				System.out.println(key1);
+				System.out.println(alldetails[1]);
+				System.out.println(alldetails[3]);
+				System.out.println(alldetails[2]);
+				System.out.println(alldetails[4]);
+				System.out.println(alldetails[5]);
+				System.out.println();
+				json.put("Price", alldetails[1]);
 				json.put("Review", alldetails[3]);
 				json.put("Images", alldetails[2]);
 				json.put("location",alldetails[4]);
-				json.put("Facilities",alldetails[5]);
+				json.put("aminities",alldetails[5]);
 				ar.add(json);
 
 			}
 			//main_json.put("Make_My_Trip",new JSONArray(ar));
 			String path = System.getProperty("user.dir");
-			PrintWriter pw= new PrintWriter(path+"\\MakeMy--Trip_json");
+			PrintWriter pw= new PrintWriter(path+"\\MakeMyTrip_json");
 			pw.println(new JSONArray(ar).toString());
 			pw.close();
 			// Print and display the Rank and Name

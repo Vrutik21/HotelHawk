@@ -8,9 +8,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DataValidation {
+    //check that both dates are greater than todays date
+    // year should be of 2 digits   (add 20)
+    /// moth can be of single digits
+
     private static final String[] DATE_FORMATS = {
             "yyyy-MM-dd", "dd-MM-yyyy", "MM-dd-yyyy", "yyyy/MM/dd", "dd/MM/yyyy", "MM/dd/yyyy",
-            "yyyy.MM.dd", "dd.MM.yyyy", "MM.dd.yyyy", "yyyyMMdd", "ddMMyyyy", "MMddyyyy"};
+            "yyyy.MM.dd", "dd.MM.yyyy", "MM.dd.yyyy"};
 
     private static final String URL_REGEX = "^(https?|ftp)://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(/\\S*)?$";
 
@@ -48,6 +52,8 @@ public class DataValidation {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date checkin = sdf.parse(checkinDate);
             Date checkout = sdf.parse(checkoutDate);
+            System.out.println(checkin);
+            System.out.println(checkout);
             return checkin.before(checkout); // Check if checkout date is after checkin date
         } catch (ParseException e) {
             return false; // Parsing error, invalid date format

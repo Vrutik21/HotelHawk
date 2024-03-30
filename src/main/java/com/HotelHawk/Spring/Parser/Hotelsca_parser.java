@@ -1,9 +1,11 @@
 package com.HotelHawk.Spring.Parser;
 
+import com.HotelHawk.Spring.FrequencyCount.FreqCount;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -24,7 +26,7 @@ import java.util.regex.Pattern;
 public class Hotelsca_parser {
     public static ArrayList<String> links= new ArrayList<String>();
     public static HashMap<String,ArrayList<String>> hotels=new HashMap<String,ArrayList<String>>();
-    public static void extract_links(String checkin_date, String checkout_date) throws IOException, InterruptedException {
+    public static void extract_links(String checkin_date, String checkout_date, String cityname) throws IOException, InterruptedException {
         File file=new File("hotelsca_links");
         BufferedReader br=new BufferedReader(new FileReader(file));
         String st;
@@ -35,21 +37,21 @@ public class Hotelsca_parser {
 
 
         }
-        hotels_parse();
+        hotels_parse(cityname);
     }
 
-    public static void hotels_parse() throws IOException, InterruptedException {
+    public static void hotels_parse(String cityname) throws IOException, InterruptedException {
         WebDriver driver =new ChromeDriver();
         ArrayList<JSONObject> json_array= new ArrayList<JSONObject>();
-        //int count=0;
         for(String link:links){
             ArrayList<String> temp_data=new ArrayList<>();
             if(link!=null) {
                 System.out.println("hotelsca");
                 System.out.println(link);
                 if (true) {
-
                     try {
+                        //counting frequency count
+                        Document d= Jsoup.parse(driver.toString());
                         driver.get(link);
                         By locator = By.cssSelector(".uitk-text.uitk-type-300.uitk-text-default-theme.is-visually-hidden");
                         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
@@ -206,9 +208,13 @@ public class Hotelsca_parser {
             }
 
         }
+
         convert_json(json_array);
 
     }
+
+
+
     public static void convert_json(ArrayList<JSONObject> json_array) throws IOException {
         JSONObject main_json=new JSONObject();
         ArrayList<JSONObject> ar=new ArrayList<JSONObject>();

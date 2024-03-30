@@ -9,9 +9,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 
 public class Booking_crawler {
@@ -22,6 +20,8 @@ public class Booking_crawler {
         String t=url+"/"+city+"-"+"Canada";
         Connection con= Jsoup.connect(t);
         Document doc=con.get();
+        int count_fc= FreqCount.fc_booking(city,doc.text());
+
         Elements e=doc.getElementsByAttributeValueContaining("target","_blank");
 
         for(Element l:e){
@@ -34,9 +34,21 @@ public class Booking_crawler {
                 }
             }
         }
+        fc_data(city,count_fc);
         save_links(links);
+
         //Booking_parser bparser= new Booking_parser();
 
+
+    }
+
+
+    public static void fc_data(String cityname, int count) throws IOException {
+        System.out.println("Hola ".concat(Integer.toString(count)));
+        String path= System.getProperty("user.dir");
+        PrintWriter pw= new PrintWriter(path.concat("\\").concat(cityname.toLowerCase()).concat("_fc"));
+        pw.println("booking:".concat(Integer.toString(count)));
+        pw.close();
 
     }
     public static void save_links(ArrayList<String> links) throws FileNotFoundException {
@@ -53,8 +65,5 @@ public class Booking_crawler {
         String request_city= "Toronto";
         extract_cities(request_city);
         save_links(links);
-
-
-
     }
 }

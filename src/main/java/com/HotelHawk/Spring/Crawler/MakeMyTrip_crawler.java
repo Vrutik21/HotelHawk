@@ -1,6 +1,5 @@
 package com.HotelHawk.Spring.Crawler;
 
-
 import java.io.FileNotFoundException;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -16,6 +15,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 public class MakeMyTrip_crawler {
 
     public static Hashtable<String, Hashtable> extractCities(String[] cities,String checkin,String checkout) throws FileNotFoundException {
+
+
         Hashtable<String,Hashtable> hs = new Hashtable<>();
         String[] incheck = checkin.split("-");
         String[] outcheck=checkout.split("-");
@@ -24,7 +25,8 @@ public class MakeMyTrip_crawler {
             WebDriver driver = new ChromeDriver();
 
             // Open a website using Selenium
-            driver.get("https://www.makemytrip.com/hotels/hotel-listing/?checkin="+incheck[1]+""+incheck[2]+""+incheck[0]+"&city=CT" +city.substring(0, 5).toUpperCase()+ "&checkout="+outcheck[1]+""+outcheck[2]+""+outcheck[0]+"&roomStayQualifier=2e0e&locusId=CT"+city.substring(0, 5).toUpperCase()+"&country=CAN&locusType=city&searchText="+city+"&regionNearByExp=3&rsc=1e2e0e");
+            String city_code = getcitycode(city);
+            driver.get("https://www.makemytrip.com/hotels/hotel-listing/?checkin="+incheck[1]+""+incheck[2]+""+incheck[0]+"&city=CT" +city.substring(0, 5).toUpperCase()+ "&checkout="+outcheck[1]+""+outcheck[2]+""+outcheck[0]+"&roomStayQualifier=2e0e&locusId="+getcitycode(city)+"&country=CAN&locusType=city&searchText="+city+"&regionNearByExp=3&rsc=1e2e0e");
 
             // wait for 5 seconds for the page to load
             //driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
@@ -39,7 +41,7 @@ public class MakeMyTrip_crawler {
                 js.executeScript("window.scrollBy(0,1000)");
                 // Wait for the jobs to load
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(7000);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -48,13 +50,12 @@ public class MakeMyTrip_crawler {
 
             // Get the HTML content of the webpage using Selenium
             String html = driver.getPageSource();
-
-            // Parse the HTML using Jsoup
             try {
-                Thread.sleep(3000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            // Parse the HTML using Jsoup
             Document document = Jsoup.parse(html);
             //  System.out.println("document:" + document);
             Hashtable<String,String[]> hb = MakeMyTrip_parser.Make_My_Trip_Parser(document, city);
@@ -64,13 +65,27 @@ public class MakeMyTrip_crawler {
         return hs;
     }
 
+    public static String getcitycode(String city)
+    {
+        Hashtable<String,String> citycodes = new Hashtable<String,String>();
+        citycodes.put("TORONTO","CTTORON");
+        citycodes.put("CALGARY","CTDIVISIONNO6");
+        citycodes.put("VANCOUVER","CTVANCO");
+        citycodes.put("MONTREAL","CTCOMMU");
+        citycodes.put("OTTAWA","CTOTTAW");
+        citycodes.put("HAMILTON","CTHAMILTO");
+        citycodes.put("EDMONTON","CTDIVIS");
+        citycodes.put("WINNIPEG","CTDIVISIONNO11");
+        citycodes.put("WINDSOR","CTESS");
+        citycodes.put("HALIFAX","CTHALIFA");
+
+        return citycodes.get(city.toUpperCase());
+    }
 
     public static void main(String[] args) throws FileNotFoundException {
-        String url = "";
-        String[] cities = new String[] {
-                "Toronto",
-                //"Windsor"
-        };
+
+        String city = "ottawa";
+        String[] cities ={city};
         String checkindate = "2024-05-23";
         String checkoutdate="2024-05-27";
         Hashtable<String,Hashtable> js = extractCities(cities,checkindate,checkoutdate);
