@@ -1,6 +1,6 @@
 import NavBar from "./NavBar";
 import Slider from "react-slick";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
@@ -11,17 +11,27 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { ArrowBackOutlined, ArrowForwardOutlined } from "@mui/icons-material";
 import Select from "react-select";
-import dayjs from "dayjs";
 import { useRef } from "react";
+import { Bounce, ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import StarIcon from "@mui/icons-material/Star";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import { Collapse } from "react-bootstrap";
 
 const Home = () => {
   const { register, handleSubmit, reset, control } = useForm();
+  const {
+    register: filterRegister,
+    formState: { errors: filterErrors },
+    handleSubmit: handleFilterSubmit,
+    reset: filterReset,
+    control: filterControl,
+  } = useForm({});
   const [hotelData, setHotelData] = useState();
+  const [spellCheck, setSpellCheck] = useState("");
   const [loader, setLoader] = useState(false);
   const [selectedOption, setSelectedOption] = useState("hotelsca");
   const [searchData, setSearchData] = useState("");
@@ -34,16 +44,58 @@ const Home = () => {
     label: "Old Crawling",
   });
   const [hotelOptions, setHotelOptions] = useState([]);
+  const [openFilter, setFilterOpen] = useState(false);
+  const [rating, setRating] = useState("");
   const hint = useRef("");
 
+  // Filters
+  const onFilterSubmit = (data) => {
+    // Handle form submission here
+    console.log(data, "filtersData");
+    let ratingNumber;
+
+    if (rating === "Good") {
+      ratingNumber = 5;
+    } else if (rating === "Average") {
+      ratingNumber = 7;
+    } else if (rating === "Excellent") {
+      ratingNumber = 8;
+    } else {
+      ratingNumber = 0;
+    }
+
+    getFiltersData(spellCheck, data.minPrice, data.maxPrice, ratingNumber);
+  };
+
+  const clearFilters = () => {
+    filterReset();
+    setRating("");
+  };
+
   console.log(hotelOptions, "hotelOptions");
+
+  const getFiltersData = async (city, minPrice, maxPrice, rating) => {
+    try {
+      setLoader(true);
+      const response = await axios.get(
+        `http://localhost:8080/filter/${city}/${minPrice}/${maxPrice}/${rating}`
+      );
+      setHotelData(response.data);
+      // filterReset()
+      setLoader(false);
+      setFilterOpen(false);
+    } catch (err) {
+      console.log("Error getting filtered data: ", err);
+      setLoader(false);
+    }
+  };
 
   const getHotelsData = async (city, checkin, checkout, hotel) => {
     try {
       const url =
         selectedCrawling.value === "oldsearch"
-          ? `http://localhost:8080/oldsearch/${city}`
-          : `http://localhost:8080/newsearch/${city}/${checkin}/${checkout}`;
+          ? `http://localhost:8080/datavalidate/oldsearch/${city}/${checkin}/${checkout}`
+          : `http://localhost:8080/datavalidate/newsearch/${city}/${checkin}/${checkout}`;
 
       const searchSelectUrl = `http://localhost:8080/select/${city}/${hotel}`;
 
@@ -51,14 +103,29 @@ const Home = () => {
       const response = await axios.get(
         hotel?.length > 0 ? searchSelectUrl : url
       );
+
       setHotelData(response.data);
-      reset();
+
+      console.log(response.status, "status");
+      // reset();
+
       setLoader(false);
-      if (response.data === null) {
-        setError("No Options");
-      }
     } catch (error) {
-      reset();
+      if (error.response.status === 400) {
+        // setError(response.data);
+        toast.error(error.response.data, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+      // reset();
       setLoader(false);
       console.error("Error fetching hotels data:", error);
     } finally {
@@ -73,6 +140,20 @@ const Home = () => {
       setTrendingCities(response?.data ? response.data : {});
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const spellCheckApi = async (city) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/spellcheck/${city}`
+      );
+
+      if (response.data.toLowerCase() !== city.toLowerCase()) {
+        setSpellCheck(response.data);
+      }
+    } catch (err) {
+      console.log("Error calling spellCheck api: ", err);
     }
   };
 
@@ -125,16 +206,14 @@ const Home = () => {
     console.log(
       {
         ...data,
-        checkin: dayjs(data.checkin).format("YYYY-MM-DD"),
-        checkout: dayjs(data.checkout).format("YYYY-MM-DD"),
       },
       "searchData"
     );
 
-    const checkin = dayjs(data.checkin).format("YYYY-MM-DD");
-    const checkout = dayjs(data.checkout).format("YYYY-MM-DD");
-
-    getHotelsData(data.city, checkin, checkout);
+    // const checkin = dayjs(data.checkin).format("YYYY-MM-DD");
+    // const checkout = dayjs(data.checkout).format("YYYY-MM-DD");
+    spellCheckApi(data.city);
+    getHotelsData(data.city, data.checkin, data.checkout);
   };
 
   const handleWebsiteSelection = (option) => {
@@ -193,7 +272,7 @@ const Home = () => {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: 4,
     slidesToScroll: 1,
     prevArrow: <CustomPrevArrow />,
     nextArrow: <CustomNextArrow />,
@@ -212,6 +291,19 @@ const Home = () => {
       {/* Navbar End */}
       {/* Header Start */}
       <div className="container-fluid header bg-white p-0 m-0" id="slogan">
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+          transition={Bounce}
+        />
         <div className="row g-0 align-items-center flex-column-reverse flex-md-row">
           <h1 className="display-5 animated fadeIn mb-4 mt-5 text-white text-above-image line">
             <span className="text-primary">Comp</span>are Hotel Prices.<br></br>
@@ -220,7 +312,7 @@ const Home = () => {
             </span>
           </h1>
           <img src="img/bg_slogan.png" alt="" />
-          <div className="col-md-6 p-5 mt-lg-5"></div>
+          {/* <div className="col-md-6 mt-lg-3"></div> */}
           <div className="col-md-6 animated fadeIn">
             <div className="owl-carousel header-carousel">
               <div className="owl-carousel-item">
@@ -234,40 +326,79 @@ const Home = () => {
         </div>
       </div>
 
-      <div class="container mb-5">
-        <h2 class="text-center mb-5 display-5 text-primary">
+      <div
+        className="container mb-5 mt-5"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <h2 className="text-center mb-5 display-5 text-primary">
           Popular Destinations
         </h2>
-        {/* <div class="row"> */}
+        {/* <div className="row"> */}
         <div
           className="row"
-          style={{ paddingLeft: "50px", paddingRight: "50px" }}
+          style={{
+            paddingLeft: "50px",
+            paddingRight: "50px",
+            width: "100%",
+          }}
         >
           <div className="popular-slick">
             <Slider {...popularDestinationSettings}>
               {trendingCities &&
                 Object.keys(trendingCities).map((key, i) => (
-                  <div
-                    className="col-md-4 position-relative"
-                    onClick={() => getHotelsData(key, "oldsearch")}
-                    key={key}
-                  >
-                    <a href="#hello-hotels">
-                      <img
-                        src={trendingCities[key].split(" ")[1]}
-                        style={{
-                          height: "430px",
-                          width: "400px",
-                          border: "1px solid transparent",
-                          borderRadius: "10px",
-                        }}
-                        alt={"Hotel " + (i + 1)}
-                        className="img-fluid"
-                      />
-                      <div className="overlay-text lead display-6">
-                        {key} - {trendingCities[key].split(" ")[0]}
+                  <div key={key}>
+                    <div
+                      className="position-relative"
+                      onClick={() => getHotelsData(key, "oldsearch")}
+                    >
+                      <a href="#hello-hotels">
+                        <img
+                          src={trendingCities[key].split(" ")[1]}
+                          style={{
+                            height: "400px",
+                            width: "400px",
+                            border: "1px solid transparent",
+                            borderRadius: "10px",
+                          }}
+                          alt={"Hotel " + (i + 1)}
+                          className="img-fluid"
+                        />
+                      </a>
+                    </div>
+                    <div className="container mt-3">
+                      <div className="row">
+                        <div
+                          className="col text-start text-dark fw-bold"
+                          style={{ fontSize: "1.2em" }}
+                        >
+                          {key}
+                        </div>
+                        <div className="col text-end">
+                          <div
+                            className="border-bottom rounded-2 d-inline-flex align-items-center shadow-sm mb-2"
+                            style={{
+                              backgroundColor: "#0877a2",
+                              color: "white",
+                            }}
+                          >
+                            <span className="p-2">
+                              {trendingCities[key].split(" ")[0]}
+                            </span>
+                            <span
+                              className="ms-1 me-2"
+                              style={{ marginTop: "-1px" }}
+                            >
+                              <TrendingUpIcon />
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </a>
+                    </div>
                   </div>
                 ))}
             </Slider>
@@ -281,10 +412,17 @@ const Home = () => {
       >
         <div className="container">
           <form onSubmit={handleSubmit(handleRegistration)}>
-            <div className="row g-2">
+            <div
+              className="row"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+              }}
+            >
               <div className="col-md-10">
-                <div className="row g-2">
-                  <div className="col-lg-4 col-md-4">
+                <div className="row g-4">
+                  <div style={{ width: "30%" }}>
                     <Autocomplete
                       onKeyDown={(event) => {
                         if (event.key === "Tab") {
@@ -321,15 +459,14 @@ const Home = () => {
                         );
                         return displayOptions;
                       }}
-                      id="combo-box-hint-demo"
                       options={hotelOptions}
-                      sx={{ width: 300 }}
                       renderInput={(params) => {
                         return (
                           <Box
                             sx={{
                               position: "relative",
                               background: "white",
+                              borderRadius: "4px",
                             }}
                           >
                             <Typography
@@ -405,53 +542,23 @@ const Home = () => {
                       }}
                     />
                   </div>
-                  <div class="col-lg-3 col-md-4">
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <Controller
-                        control={control}
-                        name="checkin"
-                        render={({ field }) => (
-                          <DatePicker
-                            {...field}
-                            label="Check In"
-                            sx={{
-                              background: "white",
-                              borderColor: "transparent",
-                            }}
-                            value={field.value ? field.value : null}
-                            onChange={(newValue) => field.onChange(newValue)}
-                            renderInput={(params) => (
-                              <TextField {...params} placeholder="Check In" />
-                            )}
-                          />
-                        )}
-                      />
-                    </LocalizationProvider>
+                  <div style={{ width: "25%", marginLeft: "15px" }}>
+                    <TextField
+                      {...register("checkin")}
+                      placeholder="Enter Check In"
+                      variant="outlined"
+                      sx={{ background: "white", borderRadius: "4px" }}
+                    />
                   </div>
-                  <div class="col-lg-3 col-md-4">
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <Controller
-                        control={control}
-                        name="checkout"
-                        render={({ field }) => (
-                          <DatePicker
-                            {...field}
-                            label="Check Out"
-                            sx={{
-                              background: "white",
-                              borderColor: "transparent",
-                            }}
-                            value={field.value ? field.value : null}
-                            onChange={(newValue) => field.onChange(newValue)}
-                            renderInput={(params) => (
-                              <TextField {...params} placeholder="Check Out" />
-                            )}
-                          />
-                        )}
-                      />
-                    </LocalizationProvider>
+                  <div style={{ width: "25%" }}>
+                    <TextField
+                      {...register("checkout")}
+                      placeholder="Enter Check Out"
+                      variant="outlined"
+                      sx={{ background: "white", borderRadius: "4px" }}
+                    />
                   </div>
-                  <div className="col-lg-2 col-md-4">
+                  <div style={{ width: "18%" }}>
                     <Select
                       {...register("crawling", {
                         value: selectedCrawling.value,
@@ -483,19 +590,22 @@ const Home = () => {
                     />
                   </div>
                 </div>
+                {searchData !== "" && spellCheck !== "" && (
+                  <div style={{ marginTop: "10px" }}>
+                    <span style={{ color: "white" }}>
+                      Did you mean: {spellCheck}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="col-lg-1 col-md-2">
-                <button
-                  className="button btn btn-dark border-0 w-100 py-3"
-                  style={{ marginLeft: "40px" }}
-                >
+                <button className="button btn btn-dark border-0 w-100 py-3">
                   Search
                 </button>
               </div>
             </div>
           </form>
         </div>
-        <div id="hello-hotels"></div>
       </div>
       {/* Search End */}
 
@@ -508,7 +618,9 @@ const Home = () => {
                 className="text-start mx-auto mb-5 wow slideInLeft"
                 data-wow-delay="0.1s"
               >
-                <h1 className="mb-3 text-primary">Hotel Listing</h1>
+                <h1 className="mb-3 text-primary">
+                  Hotel Listing {spellCheck !== "" && "- " + spellCheck}
+                </h1>
               </div>
             </div>
             <div
@@ -549,6 +661,156 @@ const Home = () => {
               </ul>
             </div>
           </div>
+          {hotelData && (
+            <div className="row g-0 gx-5 align-items-end">
+              <div className="col-lg-7">
+                <div class="mb-5 container-filter bg-white">
+                  <div class="accordion" id="filterAccordion">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="filterHeading">
+                        <button
+                          class={`${
+                            !openFilter
+                              ? "accordion-button collapsed"
+                              : "accordion-button"
+                          } text-dark fw-bold fs-5`}
+                          onClick={() => setFilterOpen(!openFilter)}
+                          aria-controls="example-collapse-text"
+                          aria-expanded={openFilter}
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#filterCollapse"
+                        >
+                          Filters
+                        </button>
+                      </h2>
+                      <Collapse in={openFilter}>
+                        <div
+                          id="example-collapse-text"
+                          class="accordion-collapse collapse"
+                          aria-labelledby="filterHeading"
+                          data-bs-parent="#filterAccordion"
+                        >
+                          <div class="accordion-body">
+                            <form onSubmit={handleFilterSubmit(onFilterSubmit)}>
+                              <div class="mb-3 d-flex align-items-center">
+                                <span class="icon-wrapper text-primary">
+                                  <LocalOfferIcon className="mt-0 icon-sm" />
+                                </span>
+                                <label class="form-label ms-2 me-4 my-auto text-primary fs-5">
+                                  Price:
+                                </label>
+                                <div class="row">
+                                  <div class="col-4">
+                                    <div class="input-group">
+                                      <span class="input-group-text">
+                                        Min <br />
+                                        (CAD)
+                                      </span>
+                                      <input
+                                        type="number"
+                                        {...filterRegister("minPrice")}
+                                        class="form-control form-control-lg text-primary"
+                                        aria-label="Minimum Price"
+                                      />
+                                    </div>
+                                  </div>
+                                  <span class="col-1 mx-0 align-self-center text-dark fw-bold fs-5 text-center">
+                                    to
+                                  </span>
+                                  <div class="col-4">
+                                    <div class="input-group">
+                                      <span class="input-group-text">
+                                        Max <br />
+                                        (CAD)
+                                      </span>
+                                      <input
+                                        type="number"
+                                        {...filterRegister("maxPrice")}
+                                        class="form-control form-control-lg text-primary"
+                                        aria-label="Maximum Price"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="mb-3 d-flex align-items-center">
+                                <span class="mt-0 pt-0 icon-wrapper text-primary">
+                                  <StarIcon className="mt-0 pt-0 icon-sm" />
+                                </span>
+                                <label class="form-label ms-2 me-3 my-auto text-primary fs-5">
+                                  Rating:
+                                </label>
+                                <div class="d-flex">
+                                  <button
+                                    type="button"
+                                    class={`btn btn-outline-primary me-3 btn-f ${
+                                      rating === "Average"
+                                        ? "active btn-primary"
+                                        : ""
+                                    }`}
+                                    onClick={() => setRating("Average")}
+                                  >
+                                    <span class="icon-wrapper me-1">
+                                      <StarIcon className="mt-0 icon-sm" />
+                                    </span>
+                                    Average
+                                  </button>
+                                  <button
+                                    type="button"
+                                    class={`btn btn-outline-primary me-3 btn-f ${
+                                      rating === "Good"
+                                        ? "active btn-primary"
+                                        : ""
+                                    }`}
+                                    onClick={() => setRating("Good")}
+                                  >
+                                    <span class="icon-wrapper me-1">
+                                      <StarIcon className="mt-0 icon-sm" />
+                                    </span>
+                                    Good
+                                  </button>
+                                  <button
+                                    type="button"
+                                    class={`btn btn-outline-primary me-3 btn-f ${
+                                      rating === "Excellent"
+                                        ? "active btn-primary"
+                                        : ""
+                                    }`}
+                                    onClick={() => setRating("Excellent")}
+                                  >
+                                    <span class="icon-wrapper me-1">
+                                      <StarIcon className="mt-0 icon-sm" />
+                                    </span>
+                                    Excellent
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="mb-3">
+                                <button
+                                  type="submit"
+                                  class="btn btn-outline-primary btn-f"
+                                >
+                                  Apply Filters
+                                </button>
+                                <button
+                                  type="button"
+                                  class="btn btn-outline-primary ms-2 btn-f"
+                                  onClick={clearFilters}
+                                >
+                                  Clear Filters
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </Collapse>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="tab-content">
             <div id="tab-1" className="tab-pane fade show p-0 active">
               <div className="row g-4">
@@ -569,7 +831,7 @@ const Home = () => {
                       alt="spinner gif"
                     />
                   </div>
-                ) : hotelData ? (
+                ) : hotelData?.[selectedOption]?.length > 0 ? (
                   (hotelData[selectedOption] ?? [...hotelData].reverse()).map(
                     (item) => (
                       <div
@@ -595,22 +857,6 @@ const Home = () => {
                                     />
                                   </div>
                                 ))}
-                              {/* <div>
-                                <img
-                                  className="img-fluid"
-                                  style={{ width: "450px", height: "300px" }}
-                                  src={item?.["Images "]?.split(" ")[1]}
-                                  alt=""
-                                />
-                              </div>
-                              <div>
-                                <img
-                                  className="img-fluid"
-                                  style={{ width: "450px", height: "300px" }}
-                                  src={item?.["Images "]?.split(" ")[2]}
-                                  alt=""
-                                />
-                              </div> */}
                             </Slider>
                           </div>
                           <div className="p-4 pb-0">
@@ -640,17 +886,82 @@ const Home = () => {
                                 paddingBottom: "10px",
                               }}
                             >
-                              {/* <i className="fa fa-map-marker-alt text-primary me-2" /> */}
                               <img
-                                width={"15px"}
+                                width={"16px"}
                                 src="rating.svg"
                                 alt="ratings"
                               />
-                              <span>{item?.["Review "].split(" ")[0]}</span>
+                              <span>
+                                {item?.["Review "]?.split(" ")[0] &&
+                                item?.["Review "]?.split(" ")[0] !== " "
+                                  ? item?.["Review "]?.split(" ")[0]
+                                  : "No reviews"}
+                              </span>
                             </div>
-                            {/* <p></p> */}
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "10px",
+                                paddingBottom: "10px",
+                              }}
+                            >
+                              <img
+                                width={"15px"}
+                                src="facility.svg"
+                                alt="ratings"
+                              />
+                              <div>
+                                {item?.["Facilities "] !== " " &&
+                                item?.["Facilities "]?.split(",")?.length >
+                                  0 ? (
+                                  item?.["Facilities "]
+                                    ?.split(",")
+                                    .slice(0, 3)
+                                    .map((facility, index, array) => (
+                                      <span>
+                                        {facility.trim()}
+                                        {index !== array.length - 1 && ","}
+                                        &nbsp;
+                                      </span>
+                                    ))
+                                ) : (
+                                  <span>Data not available</span>
+                                )}
+                              </div>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "10px",
+                                paddingBottom: "10px",
+                              }}
+                            >
+                              <img
+                                width={"15px"}
+                                src="location.svg"
+                                alt="ratings"
+                              />
+                              {item?.["Location "] === " " && (
+                                <span>Data not available</span>
+                              )}
+                              {item?.["Location "] !== " " && (
+                                <a
+                                  style={{
+                                    textDecoration: "underline",
+                                    cursor: "pointer",
+                                    color: "#666565",
+                                  }}
+                                  target="_blank"
+                                  href={`https://google.com/maps/search/?api=1&query=${item?.[
+                                    "Location "
+                                  ]?.trim()}`}
+                                  rel="noreferrer"
+                                >
+                                  {item?.["Location "]?.trim()}
+                                </a>
+                              )}
+                            </div>
                           </div>
-                          {/* <div className="d-flex border-top"></div> */}
                         </div>
                       </div>
                     )
@@ -684,28 +995,28 @@ const Home = () => {
       </div>
 
       {/* about us container */}
-      <div class="container-xxl py-5">
-        <div class="container text-center py-3">
-          <h1 class="display-5 text-primary">About Us</h1>
+      <div className="container-xxl py-5">
+        <div className="container text-center py-3">
+          <h1 className="display-5 text-primary">About Us</h1>
         </div>
 
-        <div class="container py-5">
-          <div class="row align-items-center">
+        <div className="container py-5">
+          <div className="row align-items-center">
             {/* <!-- Left Column for Picture --> */}
-            <div class="col-md-6 image-column">
+            <div className="col-md-6 image-column">
               <img
                 src="img/aboutUs.png"
-                class="img-fluid"
+                className="img-fluid"
                 alt="About Us Image"
               ></img>
             </div>
             {/* <!-- Right Column for Text --> */}
-            <div class="col-md-6">
-              <h2 class="display-6 text-secondary">
+            <div className="col-md-6">
+              <h2 className="display-6 text-secondary">
                 Why<br></br>Choosing Us
               </h2>
               <br />
-              <p class="fs-5 text-dark">
+              <p className="fs-5 text-dark">
                 We are not just a hotel booking platform; we're your trusted
                 companion in unlocking the best stay experiences. At HotelHawk,
                 our core commitment is to redefine your travel planning by
