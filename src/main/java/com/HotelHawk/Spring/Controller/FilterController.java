@@ -21,7 +21,7 @@ public class FilterController {
     public HttpEntity<String> filter(@PathVariable String cityname, @PathVariable String minprice, @PathVariable String maxprice, @PathVariable String minreviews) throws IOException {
         if (!isValidPrice(minprice, numericRegex) || Integer.parseInt(minprice)<0 || (!isValidPrice((maxprice), numericRegex)) || (Integer.parseInt(maxprice)<Integer.parseInt(minprice))){
             System.out.println("Invalid minimum price. Please input numerical value.");
-            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Invalid Price", HttpStatus.BAD_REQUEST);
         }
         String filtered_data= Filter.filter_data(cityname, Integer.parseInt(minprice), Integer.parseInt(maxprice), Integer.parseInt(minreviews));
         HttpHeaders responseHeaders = new HttpHeaders();
