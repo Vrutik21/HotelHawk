@@ -33,7 +33,8 @@ public class Hotelsca_crawler {
         WebDriver driver=new ChromeDriver();
         driver.get(url);
 
-        Document d= Jsoup.parse(driver.toString());
+        String html = driver.getPageSource();
+        Document d= Jsoup.parse(html);
         int count_fc= FreqCount.fc_hotels(cityname,d.text());
 
         driver.manage().window().maximize();
@@ -66,10 +67,19 @@ public class Hotelsca_crawler {
         BufferedReader br= new BufferedReader(new FileReader(f));
         String st;
         ArrayList<String> lines= new ArrayList<String>();
+        int counter=0;
         while((st=br.readLine())!=null){
-            lines.add(st);
+            if(st.substring(0,st.indexOf(":")).matches("hotelsca")){
+                counter=1;
+                lines.add("hotelsca:".concat(Integer.toString(count)));
+            }
+            else{
+                lines.add(st);
+            }
         }
-        lines.add("hotelsca:".concat(Integer.toString(count)));
+        if (counter==0){
+            lines.add("hotelsca:".concat(Integer.toString(count)));
+        }
         PrintWriter pw= new PrintWriter(f);
         for(String s: lines){
             pw.println(s);

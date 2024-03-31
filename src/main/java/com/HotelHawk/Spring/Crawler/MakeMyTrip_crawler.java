@@ -76,10 +76,19 @@ public class MakeMyTrip_crawler {
         BufferedReader br= new BufferedReader(new FileReader(f));
         String st;
         ArrayList<String> lines= new ArrayList<String>();
+        int counter=0;
         while((st=br.readLine())!=null){
-            lines.add(st);
+            if(st.substring(0,st.indexOf(":")).matches("mmt")){
+                counter=1;
+                lines.add("mmt:".concat(Integer.toString(count)));
+            }
+            else{
+                lines.add(st);
+            }
         }
-        lines.add("mmt:".concat(Integer.toString(count)));
+        if(counter==0){
+            lines.add("mmt:".concat(Integer.toString(count)));
+        }
         PrintWriter pw= new PrintWriter(f);
         for(String s: lines){
             pw.println(s);

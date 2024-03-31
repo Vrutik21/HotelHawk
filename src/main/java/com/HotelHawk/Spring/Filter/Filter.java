@@ -52,21 +52,29 @@ public class Filter {
         JsonNode bookingNode = rootNode.get("booking");
         if (bookingNode != null) {
             for (JsonNode entry : bookingNode) {
-                int price = entry.get("MinPrice ").asInt();
-                double review = Double.parseDouble(entry.get("Review ").asText().trim().split(" ")[0]);
-                if ((price >= minPrice && price <= maxPrice) && ((int)review >= minReview)) {
-                    bookingArray.add(entry);
+                System.out.println(entry.get("Review ").asText());
+                if ((entry.get("MinPrice ").asText().matches("Not Available ")) || (entry.get("Review ").asText().matches(" "))){
+                    //pass
                 }
+                else{
+                    int price = entry.get("MinPrice ").asInt();
+
+                    double review = Double.parseDouble(entry.get("Review ").asText().trim().split(" ")[0]);
+                    if ((price >= minPrice && price <= maxPrice) && ((int)review >= minReview)) {
+                        bookingArray.add(entry);
+                    }
+                }
+
             }
         }
         // Filter "mmt" entries
         JsonNode mmtNode = rootNode.get("mmt");
         if (mmtNode != null) {
             for (JsonNode entry : mmtNode) {
-                int price = Integer.parseInt(entry.get("Price ").asText().split(" ")[1]);
+                int price = Integer.parseInt(entry.get("MinPrice ").asText().split(" ")[1]);
                 double review = entry.get("Review ").asDouble();
 
-                if (price >= minPrice && price <= maxPrice && review*2 >= minReview) {
+                if (price >= minPrice && price <= maxPrice && (review+review) >= minReview) {
                     mmtArray.add(entry);
                 }
             }
