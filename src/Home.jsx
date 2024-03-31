@@ -45,7 +45,9 @@ const Home = () => {
   });
   const [hotelOptions, setHotelOptions] = useState([]);
   const [openFilter, setFilterOpen] = useState(false);
+  const [cityName, setCityName] = useState("");
   const [rating, setRating] = useState("");
+  const [hotelFreq, setHotelFreq] = useState([]);
   const hint = useRef("");
 
   // Filters
@@ -64,7 +66,7 @@ const Home = () => {
       ratingNumber = 0;
     }
 
-    getFiltersData(spellCheck, data.minPrice, data.maxPrice, ratingNumber);
+    getFiltersData(cityName, data.minPrice, data.maxPrice, ratingNumber);
   };
 
   const clearFilters = () => {
@@ -78,13 +80,27 @@ const Home = () => {
     try {
       setLoader(true);
       const response = await axios.get(
-        `http://localhost:8080/filter/${city}/${minPrice}/${maxPrice}/${rating}`
+        `http://localhost:8080/filter?cityname=${city}&minprice=${minPrice}&maxprice=${maxPrice}&minreviews=${rating}`
       );
       setHotelData(response.data);
       // filterReset()
       setLoader(false);
       setFilterOpen(false);
     } catch (err) {
+      if (err.response.status === 400) {
+        // setError(response.data);
+        toast.error(err.response.data, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
       console.log("Error getting filtered data: ", err);
       setLoader(false);
     }
@@ -94,8 +110,8 @@ const Home = () => {
     try {
       const url =
         selectedCrawling.value === "oldsearch"
-          ? `http://localhost:8080/datavalidate/oldsearch/${city}/${checkin}/${checkout}`
-          : `http://localhost:8080/datavalidate/newsearch/${city}/${checkin}/${checkout}`;
+          ? `http://localhost:8080/datavalidate?crawl_type=oldsearch&cityname=${city}&checkin_date=${checkin}&checkout_date=${checkout}`
+          : `http://localhost:8080/datavalidate?crawl_type=newsearch/&cityname=${city}&checkin_date=${checkin}&checkout_date=${checkout}`;
 
       const searchSelectUrl = `http://localhost:8080/select/${city}/${hotel}`;
 
@@ -105,7 +121,6 @@ const Home = () => {
       );
 
       setHotelData(response.data);
-
       console.log(response.status, "status");
       // reset();
 
@@ -133,11 +148,21 @@ const Home = () => {
     }
   };
 
-  const getTrendingCities = async () => {
+  const getTrendingCities = async (city) => {
     try {
       const response = await axios.get(`http://localhost:8080/pg/`);
 
       setTrendingCities(response?.data ? response.data : {});
+    } catch (err) {
+      console.log("Error fetching trending cities: ", err);
+    }
+  };
+
+  const getFrequencyCounter = async (city) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/fc/${city}`);
+      console.log(response.data, "resFreq");
+      setHotelFreq([response.data]);
     } catch (err) {
       console.log(err);
     }
@@ -146,13 +171,35 @@ const Home = () => {
   const spellCheckApi = async (city) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/spellcheck/${city}`
+        `http://localhost:8080/spellcheck?cityname=${city}`
       );
 
       if (response.data.toLowerCase() !== city.toLowerCase()) {
         setSpellCheck(response.data);
       }
+
+      console.log(response.data, "resSpell");
+
+      getFrequencyCounter(response.data);
+      setCityName(response.data);
     } catch (err) {
+      if (err.response.status === 400) {
+        // setError(response.data);
+        toast.error(err.response.data, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+      // reset();
+      setLoader(false);
+      console.error("Error fetching hotels data:", error);
       console.log("Error calling spellCheck api: ", err);
     }
   };
@@ -210,15 +257,36 @@ const Home = () => {
       "searchData"
     );
 
-    // const checkin = dayjs(data.checkin).format("YYYY-MM-DD");
-    // const checkout = dayjs(data.checkout).format("YYYY-MM-DD");
     spellCheckApi(data.city);
-    getHotelsData(data.city, data.checkin, data.checkout);
+    console.log(cityName, "cityname");
+    getHotelsData(data.city, data.checkin, data.checkout).then(() => {});
   };
 
   const handleWebsiteSelection = (option) => {
     setSelectedOption(option);
   };
+
+  // Function to format the date as YYYY-MM-DD
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function addOneDay(date) {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() + 1);
+    return newDate;
+  }
+
+  // Get the current date
+  const currentDate = new Date();
+  const tomorrowDate = addOneDay(currentDate);
+
+  // Format the current date
+  const formattedCurrentDate = formatDate(currentDate);
+  const formattedNextDate = formatDate(tomorrowDate);
 
   // react-slick settings
   const hotelListingsettings = {
@@ -283,6 +351,7 @@ const Home = () => {
     str.slice(str.length - 1, str.length).toLowerCase();
 
   console.log(hotelData, "hotelData");
+  console.log(hotelFreq, "hotelFreq");
 
   return (
     <div className="container-xxl bg-white p-0">
@@ -354,7 +423,14 @@ const Home = () => {
                   <div key={key}>
                     <div
                       className="position-relative"
-                      onClick={() => getHotelsData(key, "oldsearch")}
+                      onClick={() => {
+                        spellCheckApi(key);
+                        getHotelsData(
+                          key,
+                          formattedCurrentDate,
+                          formattedNextDate
+                        );
+                      }}
                     >
                       <a href="#hello-hotels">
                         <img
@@ -619,7 +695,7 @@ const Home = () => {
                 data-wow-delay="0.1s"
               >
                 <h1 className="mb-3 text-primary">
-                  Hotel Listing {spellCheck !== "" && "- " + spellCheck}
+                  Hotel Listing {cityName !== "" && "- " + cityName}
                 </h1>
               </div>
             </div>
@@ -635,7 +711,32 @@ const Home = () => {
                     href="#tab-1"
                     onClick={() => handleWebsiteSelection("hotelsca")}
                   >
-                    Hotels.ca
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>Hotels.ca</span>
+                      {hotelFreq?.length > 0 && (
+                        <div
+                          style={{
+                            width: "25px",
+                            height: "25px",
+                            backgroundColor: "#3498db",
+                            borderRadius: "50%",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            color: "white",
+                            fontSize: "15px",
+                            marginLeft: "10px",
+                          }}
+                        >
+                          <div>{hotelFreq[0].hotelsca}</div>
+                        </div>
+                      )}
+                    </div>
                   </a>
                 </li>
                 <li className="nav-item me-2">
@@ -645,7 +746,32 @@ const Home = () => {
                     href="#tab-2"
                     onClick={() => handleWebsiteSelection("booking")}
                   >
-                    Bookings.ca
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>Bookings.ca</span>
+                      {hotelFreq?.length > 0 && (
+                        <div
+                          style={{
+                            width: "25px",
+                            height: "25px",
+                            backgroundColor: "#3498db",
+                            borderRadius: "50%",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            color: "white",
+                            fontSize: "15px",
+                            marginLeft: "10px",
+                          }}
+                        >
+                          <div>{hotelFreq[0].booking}</div>
+                        </div>
+                      )}
+                    </div>
                   </a>
                 </li>
                 <li className="nav-item me-0">
@@ -655,7 +781,32 @@ const Home = () => {
                     href="#tab-3"
                     onClick={() => handleWebsiteSelection("mmt")}
                   >
-                    MakeMyTrip.com
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span>MakeMyTrip.com</span>
+                      {hotelFreq?.length > 0 && (
+                        <div
+                          style={{
+                            width: "25px",
+                            height: "25px",
+                            backgroundColor: "#3498db",
+                            borderRadius: "50%",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            color: "white",
+                            fontSize: "15px",
+                            marginLeft: "10px",
+                          }}
+                        >
+                          <div>{hotelFreq[0].mmt}</div>
+                        </div>
+                      )}
+                    </div>
                   </a>
                 </li>
               </ul>
@@ -664,12 +815,12 @@ const Home = () => {
           {hotelData && (
             <div className="row g-0 gx-5 align-items-end">
               <div className="col-lg-7">
-                <div class="mb-5 container-filter bg-white">
-                  <div class="accordion" id="filterAccordion">
-                    <div class="accordion-item">
-                      <h2 class="accordion-header" id="filterHeading">
+                <div className="mb-5 container-filter bg-white">
+                  <div className="accordion" id="filterAccordion">
+                    <div className="accordion-item">
+                      <h2 className="accordion-header" id="filterHeading">
                         <button
-                          class={`${
+                          className={`${
                             !openFilter
                               ? "accordion-button collapsed"
                               : "accordion-button"
@@ -687,115 +838,115 @@ const Home = () => {
                       <Collapse in={openFilter}>
                         <div
                           id="example-collapse-text"
-                          class="accordion-collapse collapse"
+                          className="accordion-collapse collapse"
                           aria-labelledby="filterHeading"
                           data-bs-parent="#filterAccordion"
                         >
-                          <div class="accordion-body">
+                          <div className="accordion-body">
                             <form onSubmit={handleFilterSubmit(onFilterSubmit)}>
-                              <div class="mb-3 d-flex align-items-center">
-                                <span class="icon-wrapper text-primary">
+                              <div className="mb-3 d-flex align-items-center">
+                                <span className="icon-wrapper text-primary">
                                   <LocalOfferIcon className="mt-0 icon-sm" />
                                 </span>
-                                <label class="form-label ms-2 me-4 my-auto text-primary fs-5">
+                                <label className="form-label ms-2 me-4 my-auto text-primary fs-5">
                                   Price:
                                 </label>
-                                <div class="row">
-                                  <div class="col-4">
-                                    <div class="input-group">
-                                      <span class="input-group-text">
+                                <div className="row">
+                                  <div className="col-4">
+                                    <div className="input-group">
+                                      <span className="input-group-text">
                                         Min <br />
                                         (CAD)
                                       </span>
                                       <input
                                         type="number"
                                         {...filterRegister("minPrice")}
-                                        class="form-control form-control-lg text-primary"
+                                        className="form-control form-control-lg text-primary"
                                         aria-label="Minimum Price"
                                       />
                                     </div>
                                   </div>
-                                  <span class="col-1 mx-0 align-self-center text-dark fw-bold fs-5 text-center">
+                                  <span className="col-1 mx-0 align-self-center text-dark fw-bold fs-5 text-center">
                                     to
                                   </span>
-                                  <div class="col-4">
-                                    <div class="input-group">
-                                      <span class="input-group-text">
+                                  <div className="col-4">
+                                    <div className="input-group">
+                                      <span className="input-group-text">
                                         Max <br />
                                         (CAD)
                                       </span>
                                       <input
                                         type="number"
                                         {...filterRegister("maxPrice")}
-                                        class="form-control form-control-lg text-primary"
+                                        className="form-control form-control-lg text-primary"
                                         aria-label="Maximum Price"
                                       />
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                              <div class="mb-3 d-flex align-items-center">
-                                <span class="mt-0 pt-0 icon-wrapper text-primary">
+                              <div className="mb-3 d-flex align-items-center">
+                                <span className="mt-0 pt-0 icon-wrapper text-primary">
                                   <StarIcon className="mt-0 pt-0 icon-sm" />
                                 </span>
-                                <label class="form-label ms-2 me-3 my-auto text-primary fs-5">
+                                <label className="form-label ms-2 me-3 my-auto text-primary fs-5">
                                   Rating:
                                 </label>
-                                <div class="d-flex">
+                                <div className="d-flex">
                                   <button
                                     type="button"
-                                    class={`btn btn-outline-primary me-3 btn-f ${
+                                    className={`btn btn-outline-primary me-3 btn-f ${
                                       rating === "Average"
                                         ? "active btn-primary"
                                         : ""
                                     }`}
                                     onClick={() => setRating("Average")}
                                   >
-                                    <span class="icon-wrapper me-1">
+                                    <span className="icon-wrapper me-1">
                                       <StarIcon className="mt-0 icon-sm" />
                                     </span>
                                     Average
                                   </button>
                                   <button
                                     type="button"
-                                    class={`btn btn-outline-primary me-3 btn-f ${
+                                    className={`btn btn-outline-primary me-3 btn-f ${
                                       rating === "Good"
                                         ? "active btn-primary"
                                         : ""
                                     }`}
                                     onClick={() => setRating("Good")}
                                   >
-                                    <span class="icon-wrapper me-1">
+                                    <span className="icon-wrapper me-1">
                                       <StarIcon className="mt-0 icon-sm" />
                                     </span>
                                     Good
                                   </button>
                                   <button
                                     type="button"
-                                    class={`btn btn-outline-primary me-3 btn-f ${
+                                    className={`btn btn-outline-primary me-3 btn-f ${
                                       rating === "Excellent"
                                         ? "active btn-primary"
                                         : ""
                                     }`}
                                     onClick={() => setRating("Excellent")}
                                   >
-                                    <span class="icon-wrapper me-1">
+                                    <span className="icon-wrapper me-1">
                                       <StarIcon className="mt-0 icon-sm" />
                                     </span>
                                     Excellent
                                   </button>
                                 </div>
                               </div>
-                              <div class="mb-3">
+                              <div className="mb-3">
                                 <button
                                   type="submit"
-                                  class="btn btn-outline-primary btn-f"
+                                  className="btn btn-outline-primary btn-f"
                                 >
                                   Apply Filters
                                 </button>
                                 <button
                                   type="button"
-                                  class="btn btn-outline-primary ms-2 btn-f"
+                                  className="btn btn-outline-primary ms-2 btn-f"
                                   onClick={clearFilters}
                                 >
                                   Clear Filters
@@ -1051,12 +1202,16 @@ const Home = () => {
               className="col-lg-2 col-md-4 col-sm-6 wow fadeInUp team-item"
               data-wow-delay="0.1s"
             >
-              <div className="team-item rounded overflow-hidden">
+              <div className="team-item overflow-hidden">
                 <div className="position-relative">
-                  <img className="img-fluid" src="img/team-1.jpg" alt="" />
+                  <img className="img-fluid" src="img/heet.png" alt="" />
                 </div>
                 <div className="text-center p-4 mt-3">
-                  <h5 className="fw-bold mb-0 text-primary">Full Name</h5>
+                  <h5 className="fw-bold mb-0 text-primary">
+                    Heet
+                    <br />
+                    Patel
+                  </h5>
                 </div>
               </div>
             </div>
@@ -1064,12 +1219,12 @@ const Home = () => {
               className="col-lg-2 col-md-4 col-sm-6 wow fadeInUp team-item"
               data-wow-delay="0.3s"
             >
-              <div className="team-item rounded overflow-hidden">
+              <div className="team-item overflow-hidden">
                 <div className="position-relative">
-                  <img className="img-fluid" src="img/team-2.jpg" alt="" />
+                  <img className="img-fluid" src="img/shrey.png" alt="" />
                 </div>
                 <div className="text-center p-4 mt-3">
-                  <h5 className="fw-bold mb-0 text-primary">Full Name</h5>
+                  <h5 className="fw-bold mb-0 text-primary">Shrey Shah</h5>
                 </div>
               </div>
             </div>
@@ -1077,12 +1232,12 @@ const Home = () => {
               className="col-lg-2 col-md-4 col-sm-6 wow fadeInUp team-item"
               data-wow-delay="0.5s"
             >
-              <div className="team-item rounded overflow-hidden">
+              <div className="team-item overflow-hidden">
                 <div className="position-relative">
-                  <img className="img-fluid" src="img/team-3.jpg" alt="" />
+                  <img className="img-fluid" src="img/mihir.png" alt="" />
                 </div>
                 <div className="text-center p-4 mt-3">
-                  <h5 className="fw-bold mb-0 text-primary">Full Name</h5>
+                  <h5 className="fw-bold mb-0 text-primary">Mihir Jadeja</h5>
                 </div>
               </div>
             </div>
@@ -1090,12 +1245,12 @@ const Home = () => {
               className="col-lg-2 col-md-4 col-sm-6 wow fadeInUp team-item"
               data-wow-delay="0.7s"
             >
-              <div className="team-item rounded overflow-hidden">
+              <div className="team-item overflow-hidden">
                 <div className="position-relative">
-                  <img className="img-fluid" src="img/team-4.jpg" alt="" />
+                  <img className="img-fluid" src="img/vrutik.png" alt="" />
                 </div>
                 <div className="text-center p-4 mt-3">
-                  <h5 className="fw-bold mb-0 text-primary">Full Name</h5>
+                  <h5 className="fw-bold mb-0 text-primary">Vrutik Parmar</h5>
                 </div>
               </div>
             </div>
@@ -1103,12 +1258,12 @@ const Home = () => {
               className="col-lg-2 col-md-4 col-sm-6 wow fadeInUp team-item"
               data-wow-delay="0.9s"
             >
-              <div className="team-item rounded overflow-hidden">
+              <div className="team-item overflow-hidden">
                 <div className="position-relative">
-                  <img className="img-fluid" src="img/team-4.jpg" alt="" />
+                  <img className="img-fluid" src="img/Meet.png" alt="" />
                 </div>
                 <div className="text-center p-4 mt-3">
-                  <h5 className="fw-bold mb-0 text-primary">Full Name</h5>
+                  <h5 className="fw-bold mb-0 text-primary">Meet Bhavsar</h5>
                 </div>
               </div>
             </div>
@@ -1117,14 +1272,22 @@ const Home = () => {
       </div>
 
       <div
-        className="container-fluid bg-dark text-white-50 footer pt-5 mt-5 wow fadeIn"
+        className="container-fluid text-white-50 footer wow fadeIn mt-2 ml-0 mr-0 mb-2 px-0 mx-0"
         data-wow-delay="0.1s"
       >
-        <div className="container py-5"></div>
-        <div className="container">
-          <p className="text-align-left text-white pb-2 pl-2">
-            Copyright © 2024 HotelHawk.com™. All rights reserved.
-          </p>
+        <div className="container px-0 mx-0">
+          <div className="footer-image-container border-0 mt-5">
+            <img
+              src="img/footer_merged.svg"
+              alt="Footer"
+              className="footer-image"
+            />
+          </div>
+          <div className="container-fluid p-0">
+            <p className="copyright text-center border-0">
+              Copyright © 2024 HotelHawk.com™. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
 
