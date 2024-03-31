@@ -9,8 +9,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
@@ -19,10 +21,14 @@ import java.io.FileReader;
 import java.io.IOException;
 
 @RestController
+@RequestMapping("/datavalidate")
 public class DataValidationController {
     @CrossOrigin
-    @RequestMapping("/datavalidate/{crawl_type}/{cityname}/{checkin_date}/{checkout_date}")
-    public HttpEntity<String> datavalidation(@PathVariable String cityname,@PathVariable String checkin_date, @PathVariable String checkout_date, @PathVariable String crawl_type) throws IOException, InterruptedException {
+    @GetMapping
+    public HttpEntity<String> datavalidation(@RequestParam String cityname,@RequestParam String checkin_date, @RequestParam String checkout_date, @RequestParam String crawl_type) throws IOException, InterruptedException {
+        System.out.println(cityname);
+        System.out.println(checkin_date);
+        System.out.println(checkout_date);
         String[] result= DataValidation.check(checkin_date,checkout_date,cityname);
         if(result.length==2){
             //go to call crawler,

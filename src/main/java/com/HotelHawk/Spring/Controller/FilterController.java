@@ -6,8 +6,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -17,8 +19,9 @@ import java.util.regex.Pattern;
 @RestController
 public class FilterController {
     @CrossOrigin
-    @RequestMapping("/filter/{cityname}/{minprice}/{maxprice}/{minreviews}")
-    public HttpEntity<String> filter(@PathVariable String cityname, @PathVariable String minprice, @PathVariable String maxprice, @PathVariable String minreviews) throws IOException {
+    @RequestMapping("/filter")
+    @GetMapping
+    public HttpEntity<String> filter(@RequestParam String cityname, @RequestParam String minprice, @RequestParam String maxprice, @RequestParam String minreviews) throws IOException {
         if (!isValidPrice(minprice, numericRegex) || Integer.parseInt(minprice)<0 || (!isValidPrice((maxprice), numericRegex)) || (Integer.parseInt(maxprice)<Integer.parseInt(minprice))){
             System.out.println("Invalid minimum price. Please input numerical value.");
             return new ResponseEntity<>("Invalid Price", HttpStatus.BAD_REQUEST);
