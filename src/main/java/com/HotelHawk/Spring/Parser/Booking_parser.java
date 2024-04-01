@@ -171,7 +171,7 @@ public class Booking_parser {
             lines.add(city);
         }
         br.close();
-        if(counter==1){
+        if(counter==0){
             for(String s:hotels.keySet()){
                 names.add(s);
             }

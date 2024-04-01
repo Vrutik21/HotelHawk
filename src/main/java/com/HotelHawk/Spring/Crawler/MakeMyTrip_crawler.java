@@ -19,8 +19,10 @@ public class MakeMyTrip_crawler {
 
 
         Hashtable<String,Hashtable> hs = new Hashtable<>();
-        String[] incheck = checkin.split("-");
-        String[] outcheck=checkout.split("-");
+        String[] incheck = checkin.split("/");
+        String[] outcheck=checkout.split("/");
+        System.out.println(checkout);
+        System.out.println(outcheck.length);
         for (String city : cities) {
             // Create a new instance of the Chrome driver
             WebDriver driver = new ChromeDriver();
@@ -64,12 +66,12 @@ public class MakeMyTrip_crawler {
             }
             // Parse the HTML using Jsoup
             Document document = Jsoup.parse(html);
-            //int count_cf= FreqCount.fc_mmt(city,document.text());
+            int count_cf= FreqCount.fc_mmt(city,document.text());
             //  System.out.println("document:" + document);
             Hashtable<String,String[]> hb = MakeMyTrip_parser.Make_My_Trip_Parser(document, city);
 
             hs.put(city, hb);
-            //   fc_data(city,count_cf);
+            fc_data(city,count_cf);
         }
 
         return hs;

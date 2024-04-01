@@ -149,7 +149,7 @@ public class MakeMyTrip_parser {
 				json.put("Review", alldetails[3]);
 				if(alldetails[2].length()<6)
 				{
-					json.put("Images","https://www.pikpng.com/pngl/m/106-1069399_iam-add-group1-sorry-no-image-available-clipart.png");
+					json.put("Images","https://www.pikpng.com/pngl/m/106-1069399_iam-add-group1-sorry-no-image-available-clipart.png https://www.pikpng.com/pngl/m/106-1069399_iam-add-group1-sorry-no-image-available-clipart.png");
 				}
 				else
 				{
