@@ -34,15 +34,21 @@ public class MakeMyTrip_crawler {
 
             // Maximize the window
             driver.manage().window().maximize();
-            for(int i=0;i<1; i++) {
+            try {
+                Thread.sleep(3000);
+            }
+            catch(InterruptedException e){
+                System.out.println(e);
+            }
+            for(int i=0;i<6; i++) {
                 JavascriptExecutor js = (JavascriptExecutor) driver;
                 // First scroll down , then scroll up a little and then scroll down to trigger loading of more jobs
-                js.executeScript("window.scrollBy(0,1000)");
-                js.executeScript("window.scrollBy(0,-200)");
-                js.executeScript("window.scrollBy(0,1000)");
+                js.executeScript("window.scrollBy(0,2000)");
+                js.executeScript("window.scrollBy(0,-4000)");
+                js.executeScript("window.scrollBy(0,3000)");
                 // Wait for the jobs to load
                 try {
-                    Thread.sleep(7000);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -58,12 +64,12 @@ public class MakeMyTrip_crawler {
             }
             // Parse the HTML using Jsoup
             Document document = Jsoup.parse(html);
-            int count_cf= FreqCount.fc_mmt(city,document.text());
+            //int count_cf= FreqCount.fc_mmt(city,document.text());
             //  System.out.println("document:" + document);
             Hashtable<String,String[]> hb = MakeMyTrip_parser.Make_My_Trip_Parser(document, city);
 
             hs.put(city, hb);
-            fc_data(city,count_cf);
+            //   fc_data(city,count_cf);
         }
 
         return hs;
@@ -76,19 +82,10 @@ public class MakeMyTrip_crawler {
         BufferedReader br= new BufferedReader(new FileReader(f));
         String st;
         ArrayList<String> lines= new ArrayList<String>();
-        int counter=0;
         while((st=br.readLine())!=null){
-            if(st.substring(0,st.indexOf(":")).matches("mmt")){
-                counter=1;
-                lines.add("mmt:".concat(Integer.toString(count)));
-            }
-            else{
-                lines.add(st);
-            }
+            lines.add(st);
         }
-        if(counter==0){
-            lines.add("mmt:".concat(Integer.toString(count)));
-        }
+        lines.add("mmt:".concat(Integer.toString(count)));
         PrintWriter pw= new PrintWriter(f);
         for(String s: lines){
             pw.println(s);
@@ -115,11 +112,11 @@ public class MakeMyTrip_crawler {
 
     public static void main(String[] args) throws IOException {
 
-        String city = "ottawa";
+        String city = "toronto";
         String[] cities ={city};
         String checkindate = "2024-05-23";
         String checkoutdate="2024-05-27";
         Hashtable<String,Hashtable> js = extractCities(cities,checkindate,checkoutdate);
-        MakeMyTrip_parser.convert_json(js);
+        MakeMyTrip_parser.convert_json(js,city);
     }
 }

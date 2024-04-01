@@ -50,7 +50,9 @@ public class MakeMyTrip_parser {
 			// Getting final price of the hotel
 			Element ele3 = l.getElementById("hlistpg_hotel_shown_price");
 			String str3 = ele3.text();
-			if (!price.contains(str3)){
+
+			int i=0;
+			if (i==0){
 				price.add(str3);
 				hoteldetails[1]=str3;
 				// System.out.println(str3);
@@ -82,15 +84,18 @@ public class MakeMyTrip_parser {
 
 			for(Element add : aminites)
 			{
-				str6=str6.concat(add.text()+", ");
+				str6=str6.concat(add.text()+",");
 			}
 			hoteldetails[5]=str6;
 			hoteldetails[2]=str4;
 			hoteldetails[3]=str5;
 
+			if(hoteldetails[2].length()>6)
+			{
+				hb.put(str2,hoteldetails);
 
-			hb.put(str2,hoteldetails);
-			if(hb.size()==11)
+			}
+			if(hb.size()==17)
 			{
 				break;
 			}
@@ -110,7 +115,7 @@ public class MakeMyTrip_parser {
 		pr.close();
 	}
 
-	public static void convert_json(Hashtable<String,Hashtable> js) throws FileNotFoundException {
+	public static void convert_json(Hashtable<String,Hashtable> js,String city) throws FileNotFoundException {
 		JSONObject main_json = new JSONObject();
 		ArrayList<JSONObject> ar = new ArrayList<JSONObject>();
 		Enumeration<String> e = js.keys();
@@ -131,10 +136,27 @@ public class MakeMyTrip_parser {
 				System.out.println(alldetails[4]);
 				System.out.println(alldetails[5]);
 				System.out.println();
-				json.put("MinPrice", alldetails[1]);
+
+				if(alldetails[1]==null)
+				{
+					json.put("MinPrice","100");
+				}
+				else
+				{
+					json.put("MinPrice",alldetails[1]);
+
+				}
 				json.put("Review", alldetails[3]);
-				json.put("Images", alldetails[2]);
-				json.put("Location",alldetails[4]);
+				if(alldetails[2].length()<6)
+				{
+					json.put("Images","https://www.pikpng.com/pngl/m/106-1069399_iam-add-group1-sorry-no-image-available-clipart.png");
+				}
+				else
+				{
+					json.put("Images", alldetails[2]);
+				}
+
+				json.put("Location",city);
 				json.put("Facilities",alldetails[5]);
 				ar.add(json);
 

@@ -18,6 +18,7 @@ import java.util.List;
 public class Hotelsca_crawler {
     public static ArrayList<String> linkss =new ArrayList<String>();
     public static void cities(String cityname,String checkin_date, String checkout_date) throws IOException, InterruptedException {
+        // creating a map that stores cityname and its states
         HashMap<String,String> states= new HashMap<String,String>();
         states.put("toronto","Ontario");
         states.put("calgary","Alberta");
@@ -26,18 +27,24 @@ public class Hotelsca_crawler {
         states.put("windsor","Ontario");
         states.put("winnipeg","Manitoba");
         states.put("halifax","Nova%20Scotia");
+        states.put("edmonton","Alberta");
+        states.put("ottawa","Alberta");
+        states.put("hamilton","Alberta");
         System.out.println(checkin_date);
+
+        // Adding checkin date, checkout date, city and province to base url to access hotels url
         String url= ((((("https://ca.hotels.com/Hotel-Search?adults=2&d1=".concat(checkin_date)).concat("&d2=")).concat(checkout_date)).concat("&destination=")).concat(cityname)).concat("%2C%20".concat(states.get(cityname.toLowerCase())).concat("%2C%20Canada"));
-        //String url=url_city.concat("%2C%20".concat(states.get(cityname)).concat("%2C%20Canada"));
         System.out.println(url);
         WebDriver driver=new ChromeDriver();
         driver.get(url);
 
         String html = driver.getPageSource();
         Document d= Jsoup.parse(html);
+        //getting frequency count for number of times cityname appears in the url and storing it in count_fc variable
         int count_fc= FreqCount.fc_hotels(cityname,d.text());
 
         driver.manage().window().maximize();
+        //scrolling website by Javascript Executor to load hotels for the cityname
         JavascriptExecutor js= (JavascriptExecutor) driver;
         js.executeScript("window.scrollBy(0,5000)","");
         Thread.sleep(1000);
@@ -60,6 +67,8 @@ public class Hotelsca_crawler {
     }
 
     public static void fc_data(String cityname, int count) throws IOException {
+        //storing frequency count to seperate txt file that contains parser wise frequency count
+
         System.out.println("Hola ".concat(Integer.toString(count)));
         System.out.println(cityname);
         String path= System.getProperty("user.dir");
@@ -89,6 +98,8 @@ public class Hotelsca_crawler {
 
 
     public static void save_links() throws FileNotFoundException {
+        //saving hotel url in seperate txt file for future reference
+
         //System.out.println("https://www.booking.com/hotel/ca/days-inn-toronto-downtown.en-gb.html?label=gen173nr-1FCBcoggI46AdIM1gEaCeIAQGYAQm4ARfIAQzYAQHoAQH4AQmIAgGoAgO4Apntzq8GwAIB0gIkZWMxZTk2NDItNmMxMi00YTFiLTliOTYtMDAwNGYxZmFlOTAz2AIG4AIB&aid=304142&ucfs=1&arphpl=1&dest_id=-574890&dest_type=city&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0&hpos=1&hapos=1&sr_order=popularity&srpvid=5182138d13ba0087&srepoch=1710470811&from_sustainable_property_sr=1&from=searchresults".length());
         PrintWriter pr = new PrintWriter("hotelsca_links");
         for (int i=0; i<linkss.size() ; i++){

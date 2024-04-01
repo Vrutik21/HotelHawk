@@ -21,17 +21,22 @@ public class DataValidation {
     private static final String URL_REGEX = "^(https?|ftp)://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(/\\S*)?$";
 
     public static boolean isValidURL(String url) {
+        //checking whether url is valid or not by regex, url should contain https
         Pattern pattern = Pattern.compile(URL_REGEX);
         Matcher matcher = pattern.matcher(url);
         return matcher.matches();
     }
+
     public static boolean checkCityName(String cityName, String regex) {
+        //checking whether cityname contains only alphabets
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(cityName);
         return matcher.matches();
     }
 
     public static String[] check(String checkInDateInput, String checkOutDateInput, String cityName) {
+        //method to check whether cityname contains only alphabets , checkin and checkout dates are numnerical,
+        //checkin and checkout dates are greater than current date and time and checkin date is less than checkout date
         if (!checkCityName(cityName, cityNameRegex)) {
             System.out.println("Invalid city name. Please input only alphabetic characters.");
             String [] s={""};

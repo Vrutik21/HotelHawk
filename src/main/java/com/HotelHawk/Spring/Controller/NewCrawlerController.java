@@ -21,7 +21,7 @@ import java.util.Hashtable;
 
 @RestController
 public class NewCrawlerController {
-/// user give http reques with city name
+    /// user give http reques with city name
     @CrossOrigin
     @RequestMapping("/newsearch/{cityname}/{checkin_date}/{checkout_date}")
     public HttpEntity<String> crawl_all(@PathVariable String cityname, @PathVariable String checkin_date, @PathVariable String checkout_date) throws IOException, InterruptedException {
@@ -69,26 +69,7 @@ public class NewCrawlerController {
     public void mmt_crawl(String cityname,String checkin_date, String checkout_date) throws IOException {
         String[] city={cityname};
         Hashtable<String, Hashtable> t=MakeMyTrip_crawler.extractCities(city,checkin_date,checkout_date);
-        MakeMyTrip_parser.convert_json(t);
+        MakeMyTrip_parser.convert_json(t,cityname);
 
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
