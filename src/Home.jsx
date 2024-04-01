@@ -244,6 +244,9 @@ const Home = () => {
   };
 
   useEffect(() => {
+    if (searchData === "") {
+      setSpellCheck("");
+    }
     getSearchData();
     getTrendingCities();
     console.log(pollingData, "pol");
@@ -259,7 +262,7 @@ const Home = () => {
 
     spellCheckApi(data.city);
     console.log(cityName, "cityname");
-    getHotelsData(data.city, data.checkin, data.checkout).then(() => {});
+    getHotelsData(data.city, data.checkin, data.checkout);
   };
 
   const handleWebsiteSelection = (option) => {
@@ -682,6 +685,7 @@ const Home = () => {
             </div>
           </form>
         </div>
+        <div id="hello-hotels"></div>
       </div>
       {/* Search End */}
 
@@ -695,7 +699,7 @@ const Home = () => {
                 data-wow-delay="0.1s"
               >
                 <h1 className="mb-3 text-primary">
-                  Hotel Listing {cityName !== "" && "- " + cityName}
+                  Hotel Listing {!loader && cityName !== "" && "- " + cityName}
                 </h1>
               </div>
             </div>
@@ -718,7 +722,7 @@ const Home = () => {
                       }}
                     >
                       <span>Hotels.ca</span>
-                      {hotelFreq?.length > 0 && (
+                      {!loader && hotelFreq?.length > 0 && (
                         <div
                           style={{
                             width: "25px",
@@ -753,7 +757,7 @@ const Home = () => {
                       }}
                     >
                       <span>Bookings.ca</span>
-                      {hotelFreq?.length > 0 && (
+                      {!loader && hotelFreq?.length > 0 && (
                         <div
                           style={{
                             width: "25px",
@@ -788,7 +792,7 @@ const Home = () => {
                       }}
                     >
                       <span>MakeMyTrip.com</span>
-                      {hotelFreq?.length > 0 && (
+                      {!loader && hotelFreq?.length > 0 && (
                         <div
                           style={{
                             width: "25px",
@@ -812,9 +816,9 @@ const Home = () => {
               </ul>
             </div>
           </div>
-          {hotelData && (
+          {!loader && hotelData && (
             <div className="row g-0 gx-5 align-items-end">
-              <div className="col-lg-7">
+              <div className="col-lg-6">
                 <div className="mb-5 container-filter bg-white">
                   <div className="accordion" id="filterAccordion">
                     <div className="accordion-item">
@@ -852,7 +856,7 @@ const Home = () => {
                                   Price:
                                 </label>
                                 <div className="row">
-                                  <div className="col-4">
+                                  <div className="col-5">
                                     <div className="input-group">
                                       <span className="input-group-text">
                                         Min <br />
@@ -869,7 +873,7 @@ const Home = () => {
                                   <span className="col-1 mx-0 align-self-center text-dark fw-bold fs-5 text-center">
                                     to
                                   </span>
-                                  <div className="col-4">
+                                  <div className="col-5">
                                     <div className="input-group">
                                       <span className="input-group-text">
                                         Max <br />
@@ -973,14 +977,14 @@ const Home = () => {
                       justifyContent: "center",
                       alignItems: "center",
                       gap: "20px",
+                      marginBottom: "100px",
+                      marginTop: "100px",
                     }}
                   >
-                    <img
-                      width={"50px"}
-                      style={{ marginBottom: "100px", marginTop: "100px" }}
-                      src="Spinner.gif"
-                      alt="spinner gif"
-                    />
+                    <img width={"50px"} src="Spinner.gif" alt="spinner gif" />
+                    <span style={{ fontSize: "20px" }} className="text-primary">
+                      Please wait while we crawl fresh content for you.
+                    </span>
                   </div>
                 ) : hotelData?.[selectedOption]?.length > 0 ? (
                   (hotelData[selectedOption] ?? [...hotelData].reverse()).map(
