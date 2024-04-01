@@ -120,7 +120,16 @@ const Home = () => {
         hotel?.length > 0 ? searchSelectUrl : url
       );
 
-      setHotelData(response.data);
+      if (hotel?.length > 0) {
+        setHotelData({
+          booking: response.data,
+          hotelsca: response.data,
+          mmt: response.data,
+        });
+      } else {
+        setHotelData(response.data);
+      }
+
       console.log(response.status, "status");
       // reset();
 
@@ -259,7 +268,6 @@ const Home = () => {
       },
       "searchData"
     );
-
     spellCheckApi(data.city);
     console.log(cityName, "cityname");
     getHotelsData(data.city, data.checkin, data.checkout);
@@ -427,6 +435,8 @@ const Home = () => {
                     <div
                       className="position-relative"
                       onClick={() => {
+                        console.log(key, "key");
+                        setCityName(key);
                         spellCheckApi(key);
                         getHotelsData(
                           key,
@@ -511,6 +521,7 @@ const Home = () => {
                           }
                         }
                       }}
+                      disableClearable
                       onBlur={() => {
                         hint.current = "";
                       }}
@@ -987,72 +998,72 @@ const Home = () => {
                     </span>
                   </div>
                 ) : hotelData?.[selectedOption]?.length > 0 ? (
-                  (hotelData[selectedOption] ?? [...hotelData].reverse()).map(
-                    (item) => (
-                      <div
-                        className="col-lg-4 col-md-6 wow fadeInUp"
-                        data-wow-delay="0.1s"
-                      >
-                        <div className="property-item">
-                          <div className="">
-                            <Slider {...hotelListingsettings}>
-                              {item?.["Images "]
-                                ?.trim()
-                                .split(" ")
-                                .map((photo) => (
-                                  <div>
-                                    <img
-                                      className="img-fluid"
-                                      style={{
-                                        width: "450px",
-                                        height: "300px",
-                                      }}
-                                      src={photo}
-                                      alt=""
-                                    />
-                                  </div>
-                                ))}
-                            </Slider>
+                  [...hotelData?.[selectedOption]].reverse().map((item) => (
+                    <div
+                      className="col-lg-4 col-md-6 wow fadeInUp"
+                      data-wow-delay="0.1s"
+                    >
+                      <div className="property-item">
+                        <div className="">
+                          <Slider {...hotelListingsettings}>
+                            {item?.["Images "]
+                              ?.trim()
+                              .split(" ")
+                              .map((photo) => (
+                                <div>
+                                  <img
+                                    className="img-fluid"
+                                    style={{
+                                      width: "450px",
+                                      height: "300px",
+                                    }}
+                                    src={photo}
+                                    alt=""
+                                  />
+                                </div>
+                              ))}
+                          </Slider>
+                        </div>
+                        <div className="p-4 pb-0">
+                          {item?.["Distance "]?.length > 0 && (
+                            <h6 className="text-primary mb-3">
+                              {Number(item?.["Distance "]).toFixed(2)} Km away
+                            </h6>
+                          )}
+                          <h5 className="text-primary mb-3">
+                            {item?.["MinPrice "] === "Not Available "
+                              ? "Price not available"
+                              : item?.["MinPrice "].split(" ")[0] === "CAD"
+                              ? `$ ${Math.min(
+                                  item?.["MinPrice "].split(" ")[1]
+                                )}`
+                              : `$ ${Math.min(
+                                  item?.["MinPrice "].split(" ")[0]
+                                )}`}
+                          </h5>
+                          <a className="d-block h5 mb-2" href="">
+                            {item?.["Name "]}
+                          </a>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "10px",
+                              paddingBottom: "10px",
+                            }}
+                          >
+                            <img
+                              width={"16px"}
+                              src="rating.svg"
+                              alt="ratings"
+                            />
+                            <span>
+                              {item?.["Review "]?.split(" ")[0] &&
+                              item?.["Review "]?.split(" ")[0] !== " "
+                                ? item?.["Review "]?.split(" ")[0]
+                                : "No reviews"}
+                            </span>
                           </div>
-                          <div className="p-4 pb-0">
-                            {item?.["Distance "]?.length > 0 && (
-                              <h6 className="text-primary mb-3">
-                                {Number(item?.["Distance "]).toFixed(2)} Km away
-                              </h6>
-                            )}
-                            <h5 className="text-primary mb-3">
-                              {item?.["MinPrice "] === "Not Available "
-                                ? "Price not available"
-                                : item?.["MinPrice "].split(" ")[0] === "CAD"
-                                ? `$ ${Math.min(
-                                    item?.["MinPrice "].split(" ")[1]
-                                  )}`
-                                : `$ ${Math.min(
-                                    item?.["MinPrice "].split(" ")[0]
-                                  )}`}
-                            </h5>
-                            <a className="d-block h5 mb-2" href="">
-                              {item?.["Name "]}
-                            </a>
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: "10px",
-                                paddingBottom: "10px",
-                              }}
-                            >
-                              <img
-                                width={"16px"}
-                                src="rating.svg"
-                                alt="ratings"
-                              />
-                              <span>
-                                {item?.["Review "]?.split(" ")[0] &&
-                                item?.["Review "]?.split(" ")[0] !== " "
-                                  ? item?.["Review "]?.split(" ")[0]
-                                  : "No reviews"}
-                              </span>
-                            </div>
+                          {item?.["Facilities "] !== " " && (
                             <div
                               style={{
                                 display: "flex",
@@ -1084,43 +1095,43 @@ const Home = () => {
                                 )}
                               </div>
                             </div>
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: "10px",
-                                paddingBottom: "10px",
-                              }}
-                            >
-                              <img
-                                width={"15px"}
-                                src="location.svg"
-                                alt="ratings"
-                              />
-                              {item?.["Location "] === " " && (
-                                <span>Data not available</span>
-                              )}
-                              {item?.["Location "] !== " " && (
-                                <a
-                                  style={{
-                                    textDecoration: "underline",
-                                    cursor: "pointer",
-                                    color: "#666565",
-                                  }}
-                                  target="_blank"
-                                  href={`https://google.com/maps/search/?api=1&query=${item?.[
-                                    "Location "
-                                  ]?.trim()}`}
-                                  rel="noreferrer"
-                                >
-                                  {item?.["Location "]?.trim()}
-                                </a>
-                              )}
-                            </div>
+                          )}
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "10px",
+                              paddingBottom: "10px",
+                            }}
+                          >
+                            <img
+                              width={"15px"}
+                              src="location.svg"
+                              alt="ratings"
+                            />
+                            {item?.["Location "] === " " && (
+                              <span>Data not available</span>
+                            )}
+                            {item?.["Location "] !== " " && (
+                              <a
+                                style={{
+                                  textDecoration: "underline",
+                                  cursor: "pointer",
+                                  color: "#666565",
+                                }}
+                                target="_blank"
+                                href={`https://google.com/maps/search/?api=1&query=${item?.[
+                                  "Location "
+                                ]?.trim()}`}
+                                rel="noreferrer"
+                              >
+                                {item?.["Location "]?.trim()}
+                              </a>
+                            )}
                           </div>
                         </div>
                       </div>
-                    )
-                  )
+                    </div>
+                  ))
                 ) : (
                   <div
                     style={{
