@@ -135,7 +135,6 @@ const Home = () => {
       }
 
       spellCheckApi(city);
-
       console.log(response.status, "status");
       // reset();
 
@@ -175,6 +174,7 @@ const Home = () => {
 
   const getFrequencyCounter = async (city) => {
     try {
+      console.log(city, "freqCity");
       const response = await axios.get(`http://localhost:8080/fc/${city}`);
       console.log(response.data, "resFreq");
       setHotelFreq([response.data]);
@@ -191,12 +191,14 @@ const Home = () => {
 
       if (response.data.toLowerCase() !== city.toLowerCase()) {
         setSpellCheck(response.data);
+        getFrequencyCounter(city);
+        setCityName(city);
+      } else {
+        getFrequencyCounter(response.data);
+        setCityName(response.data);
       }
 
       console.log(response.data, "resSpell");
-
-      getFrequencyCounter(response.data);
-      setCityName(response.data);
     } catch (err) {
       if (err.response.status === 400) {
         // setError(response.data);
