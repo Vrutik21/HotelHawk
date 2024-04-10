@@ -1,6 +1,6 @@
 import NavBar from "./NavBar";
 import Slider from "react-slick";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
@@ -20,6 +20,9 @@ import "react-toastify/dist/ReactToastify.css";
 import StarIcon from "@mui/icons-material/Star";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import { Collapse } from "react-bootstrap";
+import dayjs from "dayjs";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const Home = () => {
   const { register, handleSubmit, reset, control } = useForm();
@@ -49,6 +52,7 @@ const Home = () => {
   const [rating, setRating] = useState("");
   const [hotelFreq, setHotelFreq] = useState([]);
   const hint = useRef("");
+  const [isFocused, setIsFocused] = useState(false);
 
   // Filters
   const onFilterSubmit = (data) => {
@@ -129,6 +133,8 @@ const Home = () => {
       } else {
         setHotelData(response.data);
       }
+
+      spellCheckApi(city);
 
       console.log(response.status, "status");
       // reset();
@@ -265,12 +271,17 @@ const Home = () => {
     console.log(
       {
         ...data,
+        checkin: formatValue(data.checkin),
+        checkout: formatValue(data.checkout),
       },
       "searchData"
     );
-    spellCheckApi(data.city);
     console.log(cityName, "cityname");
-    getHotelsData(data.city, data.checkin, data.checkout);
+    getHotelsData(
+      data.city,
+      formatValue(data.checkin),
+      formatValue(data.checkout)
+    );
   };
 
   const handleWebsiteSelection = (option) => {
@@ -357,6 +368,10 @@ const Home = () => {
     nextArrow: <CustomNextArrow />,
   };
 
+  const formatValue = (date) => {
+    return dayjs(date).format("YYYY-MM-DD");
+  };
+
   const isLowerCase = (str) =>
     str.slice(str.length - 1, str.length) ===
     str.slice(str.length - 1, str.length).toLowerCase();
@@ -405,7 +420,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-
       <div
         className="container mb-5 mt-5"
         style={{
@@ -633,19 +647,71 @@ const Home = () => {
                     />
                   </div>
                   <div style={{ width: "25%", marginLeft: "15px" }}>
-                    <TextField
+                    <Controller
+                      name="checkin"
+                      control={control}
                       {...register("checkin")}
-                      placeholder="Enter Check In"
-                      variant="outlined"
-                      sx={{ background: "white", borderRadius: "4px" }}
+                      defaultValue={null}
+                      render={({ field }) => (
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker
+                            {...field}
+                            disablePast
+                            shouldDisableDate={(day) => {
+                              const today = dayjs();
+
+                              // Disable today
+                              if (dayjs(day).isSame(today, "day")) {
+                                return true;
+                              }
+
+                              return false;
+                            }}
+                            // fullWidth
+                            label={"Check In"}
+                            inputVariant="outlined"
+                            format="DD/MM/YYYY"
+                            sx={{
+                              background: "white",
+                              borderRadius: "5px",
+                            }}
+                          />
+                        </LocalizationProvider>
+                      )}
                     />
                   </div>
                   <div style={{ width: "25%" }}>
-                    <TextField
+                    <Controller
+                      name="checkout"
+                      control={control}
                       {...register("checkout")}
-                      placeholder="Enter Check Out"
-                      variant="outlined"
-                      sx={{ background: "white", borderRadius: "4px" }}
+                      defaultValue={null}
+                      render={({ field }) => (
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker
+                            {...field}
+                            disablePast
+                            // fullWidth
+                            label={"Check Out"}
+                            inputVariant="outlined"
+                            format="DD/MM/YYYY"
+                            shouldDisableDate={(day) => {
+                              const today = dayjs();
+
+                              // Disable today
+                              if (dayjs(day).isSame(today, "day")) {
+                                return true;
+                              }
+
+                              return false;
+                            }}
+                            sx={{
+                              background: "white",
+                              borderRadius: "5px",
+                            }}
+                          />
+                        </LocalizationProvider>
+                      )}
                     />
                   </div>
                   <div style={{ width: "18%" }}>
