@@ -24,34 +24,35 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Hotelsca_parser {
-    public static ArrayList<String> links= new ArrayList<String>();
-    public static HashMap<String,ArrayList<String>> hotels=new HashMap<String,ArrayList<String>>();
+
+    public static ArrayList<String> links = new ArrayList<String>();
+    public static HashMap<String, ArrayList<String>> hotels = new HashMap<String, ArrayList<String>>();
+
     public static void extract_links(String checkin_date, String checkout_date, String cityname) throws IOException, InterruptedException {
-        File file=new File("hotelsca_links");
-        BufferedReader br=new BufferedReader(new FileReader(file));
+        File file = new File("hotelsca_links");
+        BufferedReader br = new BufferedReader(new FileReader(file));
         String st;
         //int count=0;
-        while((st=br.readLine())!=null){
-            String t="chkin=".concat(checkin_date).concat("&chkout=").concat(checkout_date);
-            links.add((st.substring(0,st.indexOf('?')+1)).concat(t).concat(st.substring(st.indexOf('?')+35,st.length())));
-
+        while ((st = br.readLine()) != null) {
+            String t = "chkin=".concat(checkin_date).concat("&chkout=").concat(checkout_date);
+            links.add((st.substring(0, st.indexOf('?') + 1)).concat(t).concat(st.substring(st.indexOf('?') + 35, st.length())));
 
         }
         hotels_parse(cityname);
     }
 
     public static void hotels_parse(String cityname) throws IOException, InterruptedException {
-        WebDriver driver =new ChromeDriver();
-        ArrayList<JSONObject> json_array= new ArrayList<JSONObject>();
-        for(String link:links){
-            ArrayList<String> temp_data=new ArrayList<>();
-            if(link!=null) {
+        WebDriver driver = new ChromeDriver();
+        ArrayList<JSONObject> json_array = new ArrayList<JSONObject>();
+        for (String link : links) {
+            ArrayList<String> temp_data = new ArrayList<>();
+            if (link != null) {
                 System.out.println("hotelsca");
                 System.out.println(link);
                 if (true) {
                     try {
                         //counting frequency count
-                        Document d= Jsoup.parse(driver.toString());
+                        Document d = Jsoup.parse(driver.toString());
                         driver.get(link);
                         By locator = By.cssSelector(".uitk-text.uitk-type-300.uitk-text-default-theme.is-visually-hidden");
                         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
@@ -82,27 +83,24 @@ public class Hotelsca_parser {
                         }
                         temp_data.add(im);
                         //getting reviews
-                        try{
+                        try {
                             WebElement rev = driver.findElement(By.xpath("//meta[@itemprop='ratingValue']"));
                             System.out.println(rev.getAttribute("content"));
                             temp_data.add(rev.getAttribute("content"));
-                        }
-                        catch (NoSuchElementException e){
+                        } catch (NoSuchElementException e) {
                             temp_data.add("No reviews");
                             System.out.println(e);
                         }
 
                         //getting hotel location
-
-                        try{
+                        try {
                             WebElement street_loc = driver.findElement(By.xpath("//meta[@itemprop='streetAddress']"));
                             WebElement city_loc = driver.findElement(By.xpath("//meta[@itemprop='name']"));
                             WebElement province_loc = driver.findElement(By.xpath("//meta[@itemprop='addressRegion']"));
                             System.out.println(street_loc.getAttribute("content").concat(",").concat(city_loc.getAttribute("content")).concat(",").concat(province_loc.getAttribute("content")));
                             temp_data.add((street_loc.getAttribute("content").concat(",").concat(city_loc.getAttribute("content")).concat(",").concat(province_loc.getAttribute("content"))));
 
-                        }
-                        catch (NoSuchElementException e){
+                        } catch (NoSuchElementException e) {
                             temp_data.add("Location not Specified");
                         }
 
@@ -116,8 +114,6 @@ public class Hotelsca_parser {
                         //                        System.out.println(temp.getText());
                         //                    }
                         //                }
-
-
                         //getting facilities provided by the hotel
                         ArrayList<String> facilities_list = new ArrayList<String>();
                         List<WebElement> faci = driver.findElements(By.cssSelector(".uitk-layout-grid.uitk-layout-grid-has-auto-columns.uitk-layout-grid-has-columns-by-medium.uitk-layout-grid-has-columns-by-large.uitk-layout-grid-has-space.uitk-layout-grid-display-grid.uitk-spacing.uitk-spacing-padding-blockend-four"));
@@ -147,9 +143,7 @@ public class Hotelsca_parser {
                         temp_data.add(fs);
                         //WebElement faci= driver.findElement(By.cssSelector(".uitk-layout-grid.uitk-layout-grid-has-auto-columns.uitk-layout-grid-has-columns.uitk-layout-grid-has-space.uitk-layout-grid-display-grid"));
 
-
                         //getting room type, its data and its images
-
                         ////                List<WebElement> room_types= driver.findElements(By.cssSelector(".uitk-layout-flex.uitk-layout-flex-block-size-full-size.uitk-layout-flex-flex-direction-column.uitk-layout-flex-justify-content-space-between.uitk-card.uitk-card-roundcorner-all.uitk-card-has-border.uitk-card-has-overflow.uitk-card-has-primary-theme"));
                         ////                for(WebElement rt:room_types){
                         ////                    JSONObject json= new JSONObject();
@@ -213,39 +207,37 @@ public class Hotelsca_parser {
 
     }
 
-
-
     public static void convert_json(ArrayList<JSONObject> json_array) throws IOException {
-        JSONObject main_json=new JSONObject();
-        ArrayList<JSONObject> ar=new ArrayList<JSONObject>();
-        String fins="[";
-        for(String s:hotels.keySet()){
+        JSONObject main_json = new JSONObject();
+        ArrayList<JSONObject> ar = new ArrayList<JSONObject>();
+        String fins = "[";
+        for (String s : hotels.keySet()) {
 //            fins+="{";
 //            fins+="Name:".concat(hotels.get(s).get(0));
 //            fins+="Image".concat(hotels.get(s).get(1));
 //            fins+="Review".concat(hotels.get(s).get(2));
 //            fins+="Price".concat(hotels.get(s).get(3));
 //            fins+="}";
-            JSONObject json=new JSONObject();
-            json.put("Name",hotels.get(s).get(0));
-            json.put("MinPrice",hotels.get(s).get(5));
-            json.put("Review",hotels.get(s).get(2));
-            json.put("Images",hotels.get(s).get(1));
+            JSONObject json = new JSONObject();
+            json.put("Name", hotels.get(s).get(0));
+            json.put("MinPrice", hotels.get(s).get(5));
+            json.put("Review", hotels.get(s).get(2));
+            json.put("Images", hotels.get(s).get(1));
             json.put("Location", hotels.get(s).get(3));
             json.put("Facilities", hotels.get(s).get(4));
             //json.put("RoomData", new JSONArray(json_array).toString());
 
-
             ar.add(json);
         }
-        fins+="]";
+        fins += "]";
         //main_json.put("Booking",new JSONArray(ar));
         String path = System.getProperty("user.dir");
-        PrintWriter pw= new PrintWriter(path+"\\hotelsca_json");
+        PrintWriter pw = new PrintWriter(path + "\\Backend/hotelsca_json");
         pw.println(new JSONArray(ar).toString());
         pw.close();
     }
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
 
     }
 }
