@@ -141,3 +141,7 @@ HotelHawk/
 
 - **Backend**:: Contains the Java Spring Boot application.
 - **Frontend**: Contains the ReactJS application.
+
+## Project Submission
+
+### This project is submitted as part of the COMP-8547:Advanced Computing Concepts course for the Winter 2024 session. It involves demonstrating the project during a scheduled slot. The project was also selected at 9th CS demo day at University of Windsor.
